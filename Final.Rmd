@@ -56,47 +56,26 @@ a <- html_text(top_50)
 b <- str_replace_all(a, "[\r\n]" , "")
 str_replace_all(b, "[ ]+" , "")
 }
-a <- "https://www.imdb.com/search/title/?groups=top_1000&start=51&ref_=adv_nxt"
-b <- "https://www.imdb.com/search/title/?groups=top_1000&start=101&ref_=adv_nxt"
-c <- "https://www.imdb.com/search/title/?groups=top_1000&start=151&ref_=adv_nxt"
-d <- "https://www.imdb.com/search/title/?groups=top_1000&start=201&ref_=adv_nxt"
-e <- "https://www.imdb.com/search/title/?groups=top_1000&start=251&ref_=adv_nxt"
-f <- "https://www.imdb.com/search/title/?groups=top_1000&start=301&ref_=adv_nxt"
-g <- "https://www.imdb.com/search/title/?groups=top_1000&start=351&ref_=adv_nxt"
-h <- "https://www.imdb.com/search/title/?groups=top_1000&start=401&ref_=adv_nxt"
-i <- "https://www.imdb.com/search/title/?groups=top_1000&start=451&ref_=adv_nxt"
-j <- "https://www.imdb.com/search/title/?groups=top_1000&start=501&ref_=adv_nxt"
-k <- "https://www.imdb.com/search/title/?groups=top_1000&start=551&ref_=adv_nxt"
-l <- "https://www.imdb.com/search/title/?groups=top_1000&start=601&ref_=adv_nxt"
-m <- "https://www.imdb.com/search/title/?groups=top_1000&start=651&ref_=adv_nxt"
-n <- "https://www.imdb.com/search/title/?groups=top_1000&start=701&ref_=adv_nxt"
-o <- "https://www.imdb.com/search/title/?groups=top_1000&start=751&ref_=adv_nxt"
-p <- "https://www.imdb.com/search/title/?groups=top_1000&start=801&ref_=adv_nxt"
-q <- "https://www.imdb.com/search/title/?groups=top_1000&start=851&ref_=adv_nxt"
-r <- "https://www.imdb.com/search/title/?groups=top_1000&start=901&ref_=adv_nxt"
-s <- "https://www.imdb.com/search/title/?groups=top_1000&start=951&ref_=adv_nxt"
-"51-100" <- data(a)
-"101-150" <- data(b)
-"151-200" <- data(c)
-"201-250" <- data(d)
-"251-300" <- data(e)
-"301-350" <- data(f)
-"351-400" <- data(g)
-"401-450" <- data(h)
-"451-500" <- data(i)
-"501-550" <- data(j)
-"551-600" <- data(k)
-"601-650" <- data(l)
-"651-700" <- data(m)
-"701-750" <- data(n)
-"751-800" <- data(o)
-"801-850" <- data(p)
-"851-900" <- data(q)
-"901-950" <- data(r)
-"951-1000" <- data(s)
-
-
-
+"1-50" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=1")
+"51-100" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=51&ref_=adv_nxt")
+"101-150" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=101&ref_=adv_nxt")
+"151-200" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=151&ref_=adv_nxt")
+"201-250" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=201&ref_=adv_nxt")
+"251-300" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=251&ref_=adv_nxt")
+"301-350" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=301&ref_=adv_nxt")
+"351-400" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=351&ref_=adv_nxt")
+"401-450" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=401&ref_=adv_nxt")
+"451-500" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=451&ref_=adv_nxt")
+"501-550" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=501&ref_=adv_nxt")
+"551-600" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=551&ref_=adv_nxt")
+"601-650" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=601&ref_=adv_nxt")
+"651-700" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=651&ref_=adv_nxt")
+"701-750" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=701&ref_=adv_nxt")
+"751-800" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=751&ref_=adv_nxt")
+"801-850" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=801&ref_=adv_nxt")
+"851-900" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=851&ref_=adv_nxt")
+"901-950" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=901&ref_=adv_nxt")
+"951-1000" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=951&ref_=adv_nxt")
 ```
 
 
