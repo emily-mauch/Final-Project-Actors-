@@ -94,4 +94,14 @@ s <- "https://www.imdb.com/search/title/?groups=top_1000&start=951&ref_=adv_nxt"
 "851-900" <- data(q)
 "901-950" <- data(r)
 "951-1000" <- data(s)
+
+
+
 ```
+
+
+```{r}
+test1 <- as.data.frame(matrix(y, ncol = 5, nrow = 100, byrow= TRUE))
+View(test1)
+```
+
