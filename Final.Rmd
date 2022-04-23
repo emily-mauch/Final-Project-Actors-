@@ -13,6 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r Packages, include=FALSE}
 library(tidyverse)
 library(rvest) 
+install.packages("naniar")
+library(naniar)
 ```
 
 
@@ -69,6 +71,13 @@ top <- top_1000 %>% separate(V1, c("Rank", NA), sep="[.]") %>%
   separate(Actor, c(NA, "Actors"), sep = "[:]")%>%
   separate(V6, c("Votes", "Gross"), sep = "[|]", extra="merge")  %>%
   separate(Votes, c(NA, "Votes"), sep = "[:]") %>% 
-  rename("Title" = "V2", "Year"="V3")
+  rename("Title" = "V2", "Year"="V3") %>% 
+  separate(Actors, c("Actor1", "Actor2", "Actor3"), sep = "[,]") %>%
+  separate(Gross, c("Gross1", "Gross2"), sep="[:]") %>% 
+  separate(Gross2, c("Gross2", "Gross3"), sep = "[|]") %>% 
+  separate(Gross2, c("Gross2", "Gross4"), sep = "[#]") %>%
+  select("Rank":"Votes", "Gross2")%>%
+  rename("Gross" = "Gross2") %>%
+  replace_with_na(replace = list(Gross = ""))
 ```
 
