@@ -17,70 +17,37 @@ library(rvest)
 
 
 ```{r}
-top_50_url <- "https://www.imdb.com/search/title/?groups=top_1000&start=1"
-html <- read_html(top_50_url)
-top_50 <- html_nodes(html, ".text-muted+ p , .unbold , .genre , .lister-item-header a")
-```
-
-```{r}
-x <- html_text(top_50) 
-y<- str_replace_all(x, "[\r\n]" , "")
-str_replace_all(y, "[ ]+" , "")
-```
-
-#51-100 https://www.imdb.com/search/title/?groups=top_1000&start=51&ref_=adv_nxt
-#101-150 https://www.imdb.com/search/title/?groups=top_1000&start=101&ref_=adv_nxt
-#151-200 https://www.imdb.com/search/title/?groups=top_1000&start=151&ref_=adv_nxt
-#201-250 https://www.imdb.com/search/title/?groups=top_1000&start=201&ref_=adv_nxt
-#251-300 https://www.imdb.com/search/title/?groups=top_1000&start=251&ref_=adv_nxt
-#301-350 https://www.imdb.com/search/title/?groups=top_1000&start=301&ref_=adv_nxt
-#351-400 https://www.imdb.com/search/title/?groups=top_1000&start=351&ref_=adv_nxt
-#401-450 https://www.imdb.com/search/title/?groups=top_1000&start=401&ref_=adv_nxt
-#451-500 https://www.imdb.com/search/title/?groups=top_1000&start=451&ref_=adv_nxt
-#501-550 https://www.imdb.com/search/title/?groups=top_1000&start=501&ref_=adv_nxt
-#551-600 https://www.imdb.com/search/title/?groups=top_1000&start=551&ref_=adv_nxt
-#601-650 https://www.imdb.com/search/title/?groups=top_1000&start=601&ref_=adv_nxt
-#651-700 https://www.imdb.com/search/title/?groups=top_1000&start=651&ref_=adv_nxt
-#701-750 https://www.imdb.com/search/title/?groups=top_1000&start=701&ref_=adv_nxt
-#751-800 https://www.imdb.com/search/title/?groups=top_1000&start=751&ref_=adv_nxt
-#801-850 https://www.imdb.com/search/title/?groups=top_1000&start=801&ref_=adv_nxt
-#851-900 https://www.imdb.com/search/title/?groups=top_1000&start=851&ref_=adv_nxt
-#901-950 https://www.imdb.com/search/title/?groups=top_1000&start=901&ref_=adv_nxt
-#951-1000 https://www.imdb.com/search/title/?groups=top_1000&start=951&ref_=adv_nxt
-
-```{r}
 data <- function(x){
   html <- read_html(x)
-top_50 <- html_nodes(html, ".text-muted+ p , .unbold , .genre , .lister-item-header a")
+top_50 <- html_nodes(html, ".sort-num_votes-visible , .text-muted+ p , .genre , .unbold , .lister-item-header a")
 a <- html_text(top_50) 
 b <- str_replace_all(a, "[\r\n]" , "")
-str_replace_all(b, "[ ]+" , "")
+x <- str_replace_all(b, "[ ]+" , "")
+as.data.frame(matrix(x, ncol = 6, nrow = 50, byrow= TRUE))
 }
-"1-50" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=1")
-"51-100" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=51&ref_=adv_nxt")
-"101-150" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=101&ref_=adv_nxt")
-"151-200" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=151&ref_=adv_nxt")
-"201-250" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=201&ref_=adv_nxt")
-"251-300" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=251&ref_=adv_nxt")
-"301-350" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=301&ref_=adv_nxt")
-"351-400" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=351&ref_=adv_nxt")
-"401-450" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=401&ref_=adv_nxt")
-"451-500" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=451&ref_=adv_nxt")
-"501-550" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=501&ref_=adv_nxt")
-"551-600" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=551&ref_=adv_nxt")
-"601-650" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=601&ref_=adv_nxt")
-"651-700" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=651&ref_=adv_nxt")
-"701-750" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=701&ref_=adv_nxt")
-"751-800" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=751&ref_=adv_nxt")
-"801-850" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=801&ref_=adv_nxt")
-"851-900" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=851&ref_=adv_nxt")
-"901-950" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=901&ref_=adv_nxt")
-"951-1000" <- data("https://www.imdb.com/search/title/?groups=top_1000&start=951&ref_=adv_nxt")
+a <- data("https://www.imdb.com/search/title/?groups=top_1000&start=1")
+b <- data("https://www.imdb.com/search/title/?groups=top_1000&start=51&ref_=adv_nxt")
+c <- data("https://www.imdb.com/search/title/?groups=top_1000&start=101&ref_=adv_nxt")
+d <- data("https://www.imdb.com/search/title/?groups=top_1000&start=151&ref_=adv_nxt")
+e <- data("https://www.imdb.com/search/title/?groups=top_1000&start=201&ref_=adv_nxt")
+f <- data("https://www.imdb.com/search/title/?groups=top_1000&start=251&ref_=adv_nxt")
+g <- data("https://www.imdb.com/search/title/?groups=top_1000&start=301&ref_=adv_nxt")
+h <- data("https://www.imdb.com/search/title/?groups=top_1000&start=351&ref_=adv_nxt")
+i <- data("https://www.imdb.com/search/title/?groups=top_1000&start=401&ref_=adv_nxt")
+j <- data("https://www.imdb.com/search/title/?groups=top_1000&start=451&ref_=adv_nxt")
+k <- data("https://www.imdb.com/search/title/?groups=top_1000&start=501&ref_=adv_nxt")
+l <- data("https://www.imdb.com/search/title/?groups=top_1000&start=551&ref_=adv_nxt")
+m <- data("https://www.imdb.com/search/title/?groups=top_1000&start=601&ref_=adv_nxt")
+n <- data("https://www.imdb.com/search/title/?groups=top_1000&start=651&ref_=adv_nxt")
+o <- data("https://www.imdb.com/search/title/?groups=top_1000&start=701&ref_=adv_nxt")
+p <- data("https://www.imdb.com/search/title/?groups=top_1000&start=751&ref_=adv_nxt")
+q <- data("https://www.imdb.com/search/title/?groups=top_1000&start=801&ref_=adv_nxt")
+r <- data("https://www.imdb.com/search/title/?groups=top_1000&start=851&ref_=adv_nxt")
+s <- data("https://www.imdb.com/search/title/?groups=top_1000&start=901&ref_=adv_nxt")
+t <- data("https://www.imdb.com/search/title/?groups=top_1000&start=951&ref_=adv_nxt")
+
+top <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
 ```
 
 
-```{r}
-test1 <- as.data.frame(matrix(y, ncol = 5, nrow = 100, byrow= TRUE))
-View(test1)
-```
 
