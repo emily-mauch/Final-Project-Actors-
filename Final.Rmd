@@ -16,15 +16,23 @@ library(rvest)
 ```
 
 
+
 ```{r}
+#Function : data
+#Input : a url to a 50 of the top 1000 movies. Selects and formats movie rank, title, year, directors/actors, votes/gross
+#Output : a data frame of 50 movies with variables above
+
 data <- function(x){
   html <- read_html(x)
-top_50 <- html_nodes(html, ".sort-num_votes-visible , .text-muted+ p , .genre , .unbold , .lister-item-header a")
-a <- html_text(top_50) 
-b <- str_replace_all(a, "[\r\n]" , "")
-x <- str_replace_all(b, "[ ]+" , "")
-as.data.frame(matrix(x, ncol = 6, nrow = 50, byrow= TRUE))
+  top_50 <- html_nodes(html, ".sort-num_votes-visible , .text-muted+ p , .genre , .unbold , .lister-item-header a")
+  a <- html_text(top_50) 
+  b <- str_replace_all(a, "[\r\n]" , "")
+  c <- str_replace_all(b, "[ ]+" , "")
+  x <- gsub("[()]", "", c)   
+  as.data.frame(matrix(x, ncol = 6, nrow = 50, byrow= TRUE))
 }
+
+
 a <- data("https://www.imdb.com/search/title/?groups=top_1000&start=1")
 b <- data("https://www.imdb.com/search/title/?groups=top_1000&start=51&ref_=adv_nxt")
 c <- data("https://www.imdb.com/search/title/?groups=top_1000&start=101&ref_=adv_nxt")
@@ -46,8 +54,21 @@ r <- data("https://www.imdb.com/search/title/?groups=top_1000&start=851&ref_=adv
 s <- data("https://www.imdb.com/search/title/?groups=top_1000&start=901&ref_=adv_nxt")
 t <- data("https://www.imdb.com/search/title/?groups=top_1000&start=951&ref_=adv_nxt")
 
-top <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
+top_1000 <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
 ```
 
 
+
+```{r}
+#Formatting data frame 
+
+top <- top_1000 %>% separate(V1, c("Rank", NA), sep="[.]") %>%
+  separate(V4, c("Genre1", "Genre2", "Genre3"), sep="[,]")%>%
+  separate(V5, c("Director", "Actor"), sep = "[|]") %>%
+  separate(Director, c(NA, "Director"), sep = "[:]") %>%
+  separate(Actor, c(NA, "Actors"), sep = "[:]")%>%
+  separate(V6, c("Votes", "Gross"), sep = "[|]", extra="merge")  %>%
+  separate(Votes, c(NA, "Votes"), sep = "[:]") %>% 
+  rename("Title" = "V2", "Year"="V3")
+```
 
