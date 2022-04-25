@@ -18,7 +18,6 @@ library(naniar)
 ```
 
 
-
 ```{r}
 #Function : data
 #Input : a url to a 50 of the top 1000 movies. Selects and formats movie rank, title, year, directors/actors, votes/gross
