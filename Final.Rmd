@@ -84,6 +84,7 @@ top <- top_1000 %>% separate(V1, c("Rank", NA), sep="[.]") %>%
   select("Rank":"Votes", "Gross2")%>%
   rename("Gross" = "Gross2") %>%
   replace_with_na(replace = list(Gross = ""))
+
 ```
 
 ```{r}
