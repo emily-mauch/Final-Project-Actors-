@@ -33,8 +33,7 @@ data <- function(x){
   a <- html_text(top_50) 
   b <- str_replace_all(a, "[\r\n]" , "")
   c <- str_replace_all(b, "[ ]+" , "")
-  d <- gsub("[()]", "", c) 
-  x <- str_replace_all(d, "[I]+" , "")
+  x <- gsub("[()]", "", c)   
   as.data.frame(matrix(x, ncol = 6, nrow = 50, byrow= TRUE))
 }
 
@@ -102,7 +101,6 @@ Actors <- top %>%
   select(-"Remove")
 Actors <-  distinct(Actors)
 ```
-
 
 
 ```{r}
