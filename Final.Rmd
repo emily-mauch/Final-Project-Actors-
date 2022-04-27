@@ -91,16 +91,14 @@ top <- top_1000 %>% separate(V1, c("Rank", NA), sep="[.]") %>%
 #Producing data frame "actors". Contains 3 rows per movie that correlates each actor in the movie to the "top" actor. Modified top for graphing 
 #Format must be "Actor1", "Actor2" then "title"
 top_longer <- top  %>% 
-  select(Title, Actor1:Actor4)%>%
-  pivot_longer(cols= "Actor2":"Actor4",names_to= "Remove", values_to = 'Actor2') %>% 
-  select(-"Remove") 
+  select(Title, Actor1:Actor2)
 col_order <- c("Actor1", "Actor2", "Title")
 top_longer <- top_longer[, col_order]
 
 #Producing Data frame "Actors" contains just actors and removes all duplicates. Needed for graphing function 
 Actors <- top %>% 
-  select(Actor1:Actor4) %>%  
-  pivot_longer(cols= "Actor1":"Actor4",names_to= "Remove", values_to = 'Actor') %>% 
+  select(Actor1:Actor2) %>%  
+  pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
   select(-"Remove")
 Actors <-  distinct(Actors)
 ```
