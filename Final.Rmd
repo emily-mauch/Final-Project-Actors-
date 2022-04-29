@@ -33,7 +33,8 @@ data <- function(x){
   a <- html_text(top_50) 
   b <- str_replace_all(a, "[\r\n]" , "")
   c <- str_replace_all(b, "[ ]+" , "")
-  x <- gsub("[()]", "", c)   
+  d <- gsub("[()]", "", c)   
+  x <- str_replace_all(d, "[I]+", "")
   as.data.frame(matrix(x, ncol = 6, nrow = 50, byrow= TRUE))
 }
 
@@ -82,7 +83,7 @@ top <- top_1000 %>% separate(V1, c("Rank", NA), sep="[.]") %>%
   select("Rank":"Votes", "Gross2")%>%
   rename("Gross" = "Gross2") %>%
   replace_with_na(replace = list(Gross = ""))
-
+top_100 <- top %>% arrange(Year) %>% head(100)
 ```
 
 ```{r}
