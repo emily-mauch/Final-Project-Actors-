@@ -113,5 +113,3 @@ Actors <-  distinct(Actors)
 actorNetwork <- graph_from_data_frame(d=top_longer, vertices=Actors, directed=FALSE)
 plot(actorNetwork)
 ```
-
-
