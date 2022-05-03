@@ -377,7 +377,7 @@ huge_network <- graph_from_data_frame(hp_links,
                                     vertices= hp_nodes,
                                     directed = F)
 hp_network %>%   
-  edge_density()
+  edge_density() 
 
 
 hp_network %>% 
