@@ -334,6 +334,7 @@ visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>%
 
 ```
 ```{r}
+
 Actors <- top %>% 
   select(Actor1:Actor2, Title) %>%  
   pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
@@ -412,7 +413,6 @@ View(hp_links)
 visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>% 
   visIgraphLayout(layout = "layout_nicely") %>% 
   visOptions(highlightNearest = T, nodesIdSelection = T)
-
 
 ```
 
