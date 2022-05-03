@@ -59,7 +59,7 @@ r <- data("https://www.imdb.com/search/title/?groups=top_1000&start=851&ref_=adv
 s <- data("https://www.imdb.com/search/title/?groups=top_1000&start=901&ref_=adv_nxt")
 t <- data("https://www.imdb.com/search/title/?groups=top_1000&start=951&ref_=adv_nxt")
 
-top_1000 <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
+top <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
 ```
 
 
@@ -67,7 +67,7 @@ top_1000 <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
 ```{r warning=FALSE}
 #Formatting data frame 
 
-top <- top_1000 %>% separate(V1, c("Rank", NA), sep="[.]") %>%
+top <- top %>% separate(V1, c("Rank", NA), sep="[.]") %>%
   separate(V4, c("Genre1", "Genre2", "Genre3"), sep="[,]")%>%
   separate(V5, c("Director", "Actor"), sep = "[|]") %>%
   separate(Director, c(NA, "Director"), sep = "[:]") %>%
@@ -95,10 +95,14 @@ top_longer <- top_longer[, col_order]
 
 #Producing Data frame "Actors" contains just actors and removes all duplicates. Needed for graphing function 
 Actors <- top %>% 
-  select(Actor1:Actor2) %>%  
+  select(Actor1:Actor2, Title) %>%  
   pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
-  select(-"Remove")
-Actors <-  distinct(Actors)
+  select(-"Remove") %>% 
+  add_column(Number="data")
+
+col_order2 <- c("Actor", "Title", "Number")
+Actors <- Actors[, col_order2]
+Actors <-  distinct(Actors, Actor)
 ```
 
 
@@ -109,12 +113,12 @@ Actors <-  distinct(Actors)
   #vertices: Just a list of all of the actors in movies 
   #direct = FALSE due to multiple actors in multiple movies and aren't directed linked to every other actor 
 #Output: list of actors and who they are related to 
-actorNetwork <<- graph_from_data_frame(d=top_longer, vertices=Actors, directed=FALSE)
+actorNetwork <- graph_from_data_frame(d=top_longer, vertices=Actors, directed=FALSE)
 ```
 
 
 ```{r}
-#Idea 1
+#Idea 1 for graph
 ggraph(actorNetwork)+
   geom_edge_link(alpha = 0.5) +     
   geom_node_point(size = 0.5, shape = 21, stroke = 1,
@@ -123,26 +127,36 @@ ggraph(actorNetwork)+
   theme_void()
 ```
 
+```{r}
+#Idea 2 for graph 
+par(mar = c(0,0,0,0))
+ll <- layout.auto(actorNetwork_50)
+
+plot(actorNetwork_50, 
+     layout=ll,
+     vertex.label= NA,
+     vertex.size=5)
+```
 
 ```{r}
+#Shiny App with all actors 
+
 server <- function(input, output, session) {
-    
-    # global variable, what type of plot interaction
+   # global variable, what type of plot interaction
     interaction_type <- "click"
-    
-    # observe for user interaction and change the global interaction_type
-    # variable
+    # observe for user interaction and change the global interaction_type variable
     observeEvent(input$user_click, interaction_type <<- "click")
     observeEvent(input$user_brush, interaction_type <<- "brush")
     
     output$plot <- renderPlot({
-      plot(actorNetwork, 
-              layout = layout.sphere, 
-              vertex.size=5, 
-              vertex.label= NA,
-              edge.lty=1,
-              margin=0.01) 
-         
+         par(mar = c(0,0,0,0))
+          ll <- layout.auto(actorNetwork) 
+          
+          plot(actorNetwork, 
+               layout=ll,
+               vertex.label= NA,
+               vertex.size=5)
+      
     })
     
     # generate the data to put in the table
@@ -158,10 +172,9 @@ server <- function(input, output, session) {
         
     })
     
-    output$table <- DT::renderDataTable(DT::datatable(dat()[,c("Actor", "Number")]))
+    output$table <- DT::renderDataTable(DT::datatable(dat()[,c("Actor","Title", "Number")]))
     
 }
-
 
 ui <- fluidPage(
     
@@ -176,6 +189,81 @@ shinyApp(ui = ui, server = server)
 
 
 ```{r}
+par(mar = c(0,0,0,0))
+ll <- layout.auto(actorNetwork_50)
 
+plot(actorNetwork_50, 
+     layout=ll,
+     vertex.label= NA,
+     vertex.size=5)
+```
+
+
+```{r}
+#Below is only 50 of the movies - test to find people with only once connection 
+
+top_50 <- top_longer[1:50,]
+
+Actors_50 <- top_50 %>% 
+  pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
+  select(-"Remove")
+col_order2 <- c("Actor", "Title")
+Actors_50 <- Actors_50[, col_order2]
+Actors_50 <-  distinct(Actors_50, Actor)
+
+
+actorNetwork_50 <- graph_from_data_frame(d=top_50, vertices=Actors_50, directed=FALSE)
+```
+
+
+```{r}
+server <- function(input, output, session) {
+    
+    # global variable, what type of plot interaction
+    interaction_type <- "click"
+    
+    # observe for user interaction and change the global interaction_type
+    # variable
+    observeEvent(input$user_click, interaction_type <<- "click")
+    observeEvent(input$user_brush, interaction_type <<- "brush")
+    
+    output$plot <- renderPlot({
+         par(mar = c(0,0,0,0))
+          ll <- layout.auto(actorNetwork_50) 
+          
+          plot(actorNetwork_50, 
+               layout=ll,
+               vertex.label= NA,
+               vertex.size=5)
+      
+    })
+    
+    # generate the data to put in the table
+    dat <- reactive({
+        
+        user_brush <- input$user_brush
+        user_click <- input$user_click
+        
+        if(interaction_type == "brush") res <- brushedPoints(Actors, user_brush)
+        if(interaction_type == "click") res <- nearPoints(Actors, user_click, threshold = 10, maxpoints = 1)
+        
+        return(res)
+        
+    })
+    
+    output$table <- DT::renderDataTable(DT::datatable(dat()[,c("Actor","Title", "Number")]))
+    
+}
+
+
+ui <- fluidPage(
+    
+    h3("Top 2 Actors from top 1000 movies"),
+    plotOutput("plot", click = "user_click", brush = "user_brush"),
+    DT::dataTableOutput("table")
+    
+)
+
+shinyApp(ui = ui, server = server)
 ```
 
