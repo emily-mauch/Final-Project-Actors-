@@ -116,6 +116,7 @@ actorNetwork <- graph_from_data_frame(d=top_longer, vertices=Actors, directed=FA
 
 ```{r}
 #Idea 1 for graph
+library(ggraph)
 ggraph(actorNetwork)+
   geom_edge_link(alpha = 0.5) +     
   geom_node_point(size = 0.5, shape = 21, stroke = 1,
@@ -285,17 +286,17 @@ library(visNetwork)
 library(DT)
 library(plotly)
 
-
+###getting data files 
 hp_links <- read_csv("relations.csv")
 hp_nodes <- read_csv("characters.csv")
 
-
+##creating network
 hp_network <- graph_from_data_frame(hp_links,
                                     vertices= hp_nodes,
                                     directed = F)
-
 hp_network %>% 
   edge_density()
+
 
 hp_network %>% 
   distances() %>% 
@@ -318,14 +319,95 @@ hp_links <- hp_links %>%
   mutate(betweenness= edge_betweenness(hp_network)) %>% 
   mutate(value= betweenness)
 
-hp_nodes
-hp_links
+
 
 edges <- data.frame(from = hp_links$source, to=hp_links$target)
 
 
-View(hpnodes)
-View(hplinks)
+View(hp_nodes)
+View(hp_links)
+
+visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>% 
+  visIgraphLayout(layout = "layout_nicely") %>% 
+  visOptions(highlightNearest = T, nodesIdSelection = T)
+
+
+```
+```{r}
+Actors <- top %>% 
+  select(Actor1:Actor2, Title) %>%  
+  pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
+  select(-"Remove")
+
+View(Actors)
+actorswide <- top %>% 
+  select(Actor1:Actor2)
+
+distinctactors <- top %>% 
+  select(Actor1:Actor2) %>%  
+  pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>%    select(-"Remove")
+#Removes duplicate actors
+distinctactors <- distinct(distinctactors, Actor)
+
+
+
+distinctactors$ID <- seq(1:1304)
+distinctactors$Actor2 <- distinctactors$Actor
+colnames(distinctactors) <- c("Actor1", "ID", "Actor2")
+View(distinctactors)
+merged1 <- merge(distinctactors, actorswide, by="Actor1")
+mergedint <-merged1[,-3]
+colnames(mergedint) <- c("Actor1", "ID", "Actor2")
+mergedint2 <- merge(distinctactors, mergedint, by="Actor2")
+
+finalmerged <- select(mergedint2, -c(1,2,4))
+colnames(finalmerged) <- c("Source", "Target")
+View(finalmerged)
+hugenodes <- select(distinctactors, c(1,2))
+colnames(hugenodes) <- c("Actor", "ID")
+View(hugenodes)
+
+
+
+huge_links <- finalmerged
+huge_nodes <- hugenodes
+
+##creating network
+huge_network <- graph_from_data_frame(hp_links,
+                                    vertices= hp_nodes,
+                                    directed = F)
+hp_network %>% 
+  edge_density()
+
+
+hp_network %>% 
+  distances() %>% 
+  as.vector() %>%              
+  as_tibble() %>%              
+  plot_ly(x = ~value) %>% 
+  add_histogram()
+
+hp_network %>% 
+  get_diameter() %>% 
+  length()
+
+hp_nodes <- hp_nodes %>%
+  mutate(label = name) %>% 
+  mutate(title = name) %>% 
+  mutate(degree= degree(hp_network)) %>% 
+  mutate(value = degree)
+
+hp_links <- hp_links %>% 
+  mutate(betweenness= edge_betweenness(hp_network)) %>% 
+  mutate(value= betweenness)
+
+
+
+edges <- data.frame(from = hp_links$source, to=hp_links$target)
+
+
+View(hp_nodes)
+View(hp_links)
 
 visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>% 
   visIgraphLayout(layout = "layout_nicely") %>% 
