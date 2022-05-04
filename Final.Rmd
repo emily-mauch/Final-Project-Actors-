@@ -347,6 +347,7 @@ nodes_small <- select(Actors_small, c(1,2))
 ```{r}
 small_links <- finalmerged_small
 small_nodes <- nodes_small
+View(small_nodes)
 
 
 ##creating network
@@ -396,6 +397,16 @@ visNetwork(nodes=small_nodes, edges, main = "Small Network Diagram") %>%
 
 ```
 
+```{r}
+baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], to=V(hp_network), weights=NA))
+View(baconhp)
+
+baconsmallnet <- as.data.frame(distances(small_network, v=V(small_network)["70"], to=V(small_network), weights=NA))
+View(baconsmallnet)
+
+
+
+```
 
 
 >>>>>>> bc394c71cecc088718dbaa99ad1dfaa312412ebd
