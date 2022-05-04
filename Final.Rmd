@@ -20,6 +20,7 @@ library(tidyverse)
 library(rvest) 
 library(naniar)
 library(igraph)
+library(ggraph)
 ```
 
 
@@ -104,7 +105,6 @@ Actors <- top %>%
 Actors <- distinct(Actors, Actor)
 ```
 
-
 ```{r}
 #Producing actor network plot 
 #Input:
@@ -116,10 +116,8 @@ actorNetwork <- graph_from_data_frame(d=top_longer, vertices=Actors, directed=FA
 plot(actorNetwork)
 ```
 
-
 ```{r}
-#Idea 1 for graph
-library(ggraph)
+#Graph with all actors
 ggraph(actorNetwork)+
   geom_edge_link(alpha = 0.5) +     
   geom_node_point(size = 0.5, shape = 21, stroke = 1,
@@ -129,7 +127,7 @@ ggraph(actorNetwork)+
 ```
 
 ```{r}
-#Idea 2 for graph 
+#Graph with all actors
 par(mar = c(0,0,0,0))
 ll <- layout.auto(actorNetwork)
 
@@ -140,144 +138,57 @@ plot(actorNetwork,
 ```
 
 ```{r}
-#Shiny App with all actors 
-
-server <- function(input, output, session) {
-   # global variable, what type of plot interaction
-    interaction_type <- "click"
-    # observe for user interaction and change the global interaction_type variable
-    observeEvent(input$user_click, interaction_type <<- "click")
-    observeEvent(input$user_brush, interaction_type <<- "brush")
-#Plot     
-    output$plot <- renderPlot({
-         par(mar = c(0,0,0,0))
-          ll <- layout.auto(actorNetwork) 
-          
-          plot(actorNetwork, 
-               layout=ll,
-               vertex.label= NA,
-               vertex.size=5)
-    })
-# generate the data to put in the table
-    dat <- reactive({
-        
-        user_brush <- input$user_brush
-        user_click <- input$user_click
-        
-        if(interaction_type == "brush") res <- brushedPoints(Actors, user_brush)
-        if(interaction_type == "click") res <- nearPoints(Actors, user_click, threshold = 10, maxpoints = 1)
-        
-        return(res)
-        
-    })
-#Making data table    
-    output$table <- DT::renderDataTable(DT::datatable(dat()[,c("Actor")]))
-    
-}
-
-#ui <- fluidPage(
-#output you actually see    
-  #  h3("Top 2 Actors from top 1000 movies"),
-    #plotOutput("plot", click = "user_click", brush = "user_brush"),
-    #DT::dataTableOutput("table")
-    
-#)
-
-#shinyApp(ui = ui, server = server)
+#Producing data frame with just actors with more then one connection
+actorswide2 <- data.frame(actorswide)
+unique_actors1 <- data_frame("actor1" = unique(actorswide2$Actor1)) 
+unique_actors1 <- unique_actors1 %>% arrange(actor1)
+unique_actors1$connections <- table(actorswide2$Actor1)
+unique_actors2 <- data_frame("actor1" = unique(actorswide2$Actor2)) 
+unique_actors2 <- unique_actors2 %>% arrange(actor1)
+unique_actors2$connections <- table(actorswide2$Actor2)
+unique_1<- rbind(anti_join(unique_actors1, unique_actors2, "actor1"), anti_join(unique_actors2, unique_actors1, "actor1")) 
+unique_1 <- unique_1 %>% filter(connections == "1")
+actorswide2$tf <- actorswide2$Actor1 %in% unique_1$actor1
+actorswide2$tf2 <- actorswide2$Actor2 %in% unique_1$actor1
+actorswide2 <- actorswide2 %>% filter(tf == FALSE | tf2 == FALSE)
 ```
 
-
 ```{r}
-#par(mar = c(0,0,0,0))
-#ll <- layout.auto(actorNetwork_50)
-
-#plot(actorNetwork_50, 
-     #layout=ll,
-     #vertex.label= NA,
-     #vertex.size=5)
-```
-
-
-```{r}
-#Below is only 50 of the movies - test to find people with only once connection 
-
-top_50 <- top_longer[1:50,]
-
-Actors_50 <- top_50 %>% 
+#Producing data frame with only actors who have more then one connection
+Actors_small <- actorswide2 %>% 
+  select(Actor1:Actor2) %>%  
   pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
   select(-"Remove")
-col_order2 <- c("Actor", "Title")
-Actors_50 <- Actors_50[, col_order2]
-Actors_50 <-  distinct(Actors_50, Actor)
+Actors_small<- distinct(Actors_small)
 
+#Producing actor network plot 
+#Input:
+  #d: data frame with top actor linked the 2nd, 3rd and 4th actors divided out by movie
+  #vertices: Just a list of all of the actors in movies 
+  #direct = FALSE due to multiple actors in multiple movies and aren't directed linked to every other actor 
+#Output: list of actors and who they are related to 
+actorNetwork_small <- graph_from_data_frame(d=actorswide2, vertices=Actors_small, directed=FALSE)
 
-actorNetwork_50 <- graph_from_data_frame(d=top_50, vertices=Actors_50, directed=FALSE)
+#Producing graph with only actors who have more then one connection
+ggraph(actorNetwork_small)+
+  geom_edge_link(alpha = 0.5) +     
+  geom_node_point(size = 0.5, shape = 21, stroke = 1,
+                  fill = 'white', color = 'black') +
+  geom_node_text(aes(label=NA), size = 3) +
+  theme_void()
+
+#Producing graph with only actors who have more then one connection
+par(mar = c(0,0,0,0))
+ll <- layout.auto(actorNetwork_small)
+
+plot(actorNetwork, 
+     layout=ll,
+     vertex.label= NA,
+     vertex.size=5)
 ```
 
 
-```{r}
-output <- c()
-```
 
-
-```{r}
-server <- function(input, output, session) {
-   # global variable, what type of plot interaction
-    interaction_type <- "click"
-    # observe for user interaction and change the global interaction_type variable
-    observeEvent(input$user_click, interaction_type <<- "click")
-    observeEvent(input$plot1_dblclick, {
-          brush <- input$plot1_brush
-            if (!is.null(brush)) {
-            ranges$x <- c(brush$xmin, brush$xmax)
-            ranges$y <- c(brush$ymin, brush$ymax)
-
-           } else {
-          ranges$x <- NULL
-          ranges$y <- NULL
-    }
-  })
-    ranges <- reactiveValues(x = NULL, y = NULL)
-    
-    output$plot <- renderPlot({
-         par(mar = c(0,0,0,0))
-          ll <- layout.auto(actorNetwork) 
-          
-          plot(actorNetwork, 
-               layout=ll,
-               vertex.label= NA,
-               vertex.size=5)
-          coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE)
-    })
-    # generate the data to put in the table
-    dat <- reactive({
-        
-        user_click <- input$user_click
-        
-
-        if(interaction_type == "click") res <- nearPoints(Actors, user_click, threshold = 10, maxpoints = 1)
-        
-        return(res)
-        
-    })
-    
-    output$table <- DT::renderDataTable(DT::datatable(dat()[,c("Actor")]))
-    
-}
-
-ui <- fluidPage(
-    
-    h3("Top 2 Actors from top 1000 movies"),
-    plotOutput("plot", click = "user_click", 
-               dblclick = "plot1_dblclick",
-                brush = brushOpts(id = "plot1_brush",
-                    resetOnNew = TRUE)),
-    DT::dataTableOutput("table")
-    
-)
-
-shinyApp(ui = ui, server = server)
-```
 ```{r}
 ##possibly extra example 
 
@@ -419,19 +330,10 @@ visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>%
   visOptions(highlightNearest = T, nodesIdSelection = T)
 
 ```
-```{r}
-actorswide2 <- data.frame(actorswide)
-unique_actors1 <- data_frame("actor1" = unique(actorswide2$Actor1)) 
-unique_actors1 <- unique_actors1 %>% arrange(actor1)
-unique_actors1$connections <- table(actorswide2$Actor1)
-unique_actors2 <- data_frame("actor1" = unique(actorswide2$Actor2)) 
-unique_actors2 <- unique_actors2 %>% arrange(actor1)
-unique_actors2$connections <- table(actorswide2$Actor2)
-unique_1<- rbind(anti_join(unique_actors1, unique_actors2, "actor1"), anti_join(unique_actors2, unique_actors1, "actor1")) 
-unique_1 <- unique_1 %>% filter(connections == "1")
-actorswide2$tf <- actorswide2$Actor1 %in% unique_1$actor1
-actorswide2$tf2 <- actorswide2$Actor2 %in% unique_1$actor1
-actorswide2 <- actorswide2 %>% filter(tf == TRUE & tf2 == TRUE)
-```
+
+
+
+
+
 
 >>>>>>> bc394c71cecc088718dbaa99ad1dfaa312412ebd
