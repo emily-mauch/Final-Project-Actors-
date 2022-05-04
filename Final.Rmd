@@ -2,7 +2,10 @@
 title: "Final"
 author: "Emily Mauch"
 date: "4/18/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -10,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r Packages to install, eval=FALSE}
-<<<<<<< HEAD
+
 #install.packages("naniar")
 #install.packages("igraph")
 #install.packages("ggraph")
@@ -23,7 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("ggraph")
 #install.packages("visNetwork")
 #install.packages('DT')
->>>>>>> 1800b34eb65db45bae9ae10abb418fc2c2eefbea
+
 ```
 
 ```{r Packages to open, include=FALSE}
@@ -448,17 +451,17 @@ mergedbacon<- mergedbacon[,-1]
 
 ```{r}
 #install.packages("reactable")
-library(reactable)
 
-reactable(mergedbacon)
-reactable(baconhp)
+
+#reactable(mergedbacon)
+#reactable(baconhp)
 ```
 
 
 
 ```{r, echo=FALSE}
 
-
+library(reactable)
 reactable(mergedbacon, filterable = TRUE, minRows = 1)
 reactable(baconhp, filterable = TRUE, minRows = 1)
 
