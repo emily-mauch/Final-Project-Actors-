@@ -429,5 +429,17 @@ View(mergedbacon)
 
 ```
 
+```{r}
+#install.packages("reactable")
+library(reactable)
+
+reactable(mergedbacon)
+
+reactable(mergedbacon, filterable = TRUE, minRows = 1)
+reactable(baconhp, filterable = TRUE, minRows = 1)
+
+
+```
+
 
 >>>>>>> bc394c71cecc088718dbaa99ad1dfaa312412ebd
