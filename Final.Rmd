@@ -10,12 +10,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r Packages to install, eval=FALSE}
+<<<<<<< HEAD
 #install.packages("naniar")
 #install.packages("igraph")
 #install.packages("ggraph")
 #install.packages("visNetwork")
 #install.packages('DT')
 
+=======
+install.packages("naniar")
+install.packages("igraph")
+install.packages("ggraph")
+install.packages("visNetwork")
+install.packages('DT')
+>>>>>>> 1800b34eb65db45bae9ae10abb418fc2c2eefbea
 ```
 
 ```{r Packages to open, include=FALSE}
@@ -405,7 +413,7 @@ baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], 
 
 baconhp <- as.data.frame(t(baconhp))
 baconhp <- tibble::rownames_to_column(baconhp, "Name")
-colnames(baconhp) <- c("Name", "Score")
+colnames(baconhp) <- c("name", "score")
 
 #View(baconhp)
 
@@ -427,12 +435,17 @@ colnames(baconsmallnet) <- c("Score", "ID")
 mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
 mergedbacon <- mergedbacon[,-1]
 #View(mergedbacon)
+#View(baconsmallnet)
+colnames(baconsmallnet) <- c("score", "ID")
+
+
+mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
+#View(mergedbacon)
 
 ```
 
-
-```{r, include=FALSE}
-#install.packages("reactable")
+```{r}
+install.packages("reactable")
 library(reactable)
 
 reactable(mergedbacon)
@@ -443,11 +456,13 @@ reactable(baconhp)
 
 ```{r, echo=FALSE}
 
+
 reactable(mergedbacon, filterable = TRUE, minRows = 1)
 reactable(baconhp, filterable = TRUE, minRows = 1)
 
 
 ```
+
 
 ```{r, echo=FALSE}
 ##For a specific genre
@@ -456,4 +471,4 @@ reactable(baconhp, filterable = TRUE, minRows = 1)
 ```
 
 
->>>>>>> bc394c71cecc088718dbaa99ad1dfaa312412ebd
+
