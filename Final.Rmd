@@ -9,10 +9,13 @@ output: word_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r Packages to install, include=FALSE}
+```{r Packages to install, eval=FALSE}
 install.packages("naniar")
 install.packages("igraph")
 install.packages("ggraph")
+install.packages("visNetwork")
+install.packages('DT')
+
 ```
 
 ```{r Packages to open, include=FALSE}
@@ -21,6 +24,9 @@ library(rvest)
 library(naniar)
 library(igraph)
 library(ggraph)
+library(visNetwork)            
+library(DT)
+library(plotly)
 ```
 
 
@@ -113,10 +119,8 @@ Actors <- distinct(Actors, Actor)
   #direct = FALSE due to multiple actors in multiple movies and aren't directed linked to every other actor 
 #Output: list of actors and who they are related to 
 actorNetwork <- graph_from_data_frame(d=top_longer, vertices=Actors, directed=FALSE)
-plot(actorNetwork)
-```
 
-```{r}
+
 #Graph with all actors
 ggraph(actorNetwork)+
   geom_edge_link(alpha = 0.5) +     
@@ -124,9 +128,7 @@ ggraph(actorNetwork)+
                   fill = 'white', color = 'black') +
   geom_node_text(aes(label=NA), size = 3) +
   theme_void()
-```
 
-```{r}
 #Graph with all actors
 par(mar = c(0,0,0,0))
 ll <- layout.auto(actorNetwork)
@@ -137,68 +139,9 @@ plot(actorNetwork,
      vertex.size=5)
 ```
 
-```{r}
-#Producing data frame with just actors with more then one connection
-actorswide2 <- data.frame(actorswide)
-unique_actors1 <- data_frame("actor1" = unique(actorswide2$Actor1)) 
-unique_actors1 <- unique_actors1 %>% arrange(actor1)
-unique_actors1$connections <- table(actorswide2$Actor1)
-unique_actors2 <- data_frame("actor1" = unique(actorswide2$Actor2)) 
-unique_actors2 <- unique_actors2 %>% arrange(actor1)
-unique_actors2$connections <- table(actorswide2$Actor2)
-unique_1<- rbind(anti_join(unique_actors1, unique_actors2, "actor1"), anti_join(unique_actors2, unique_actors1, "actor1")) 
-unique_1 <- unique_1 %>% filter(connections == "1")
-actorswide2$tf <- actorswide2$Actor1 %in% unique_1$actor1
-actorswide2$tf2 <- actorswide2$Actor2 %in% unique_1$actor1
-actorswide2 <- actorswide2 %>% filter(tf == FALSE | tf2 == FALSE)
-```
-
-```{r}
-#Producing data frame with only actors who have more then one connection
-Actors_small <- actorswide2 %>% 
-  select(Actor1:Actor2) %>%  
-  pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
-  select(-"Remove")
-Actors_small<- distinct(Actors_small)
-
-#Producing actor network plot 
-#Input:
-  #d: data frame with top actor linked the 2nd, 3rd and 4th actors divided out by movie
-  #vertices: Just a list of all of the actors in movies 
-  #direct = FALSE due to multiple actors in multiple movies and aren't directed linked to every other actor 
-#Output: list of actors and who they are related to 
-actorNetwork_small <- graph_from_data_frame(d=actorswide2, vertices=Actors_small, directed=FALSE)
-
-#Producing graph with only actors who have more then one connection
-ggraph(actorNetwork_small)+
-  geom_edge_link(alpha = 0.5) +     
-  geom_node_point(size = 0.5, shape = 21, stroke = 1,
-                  fill = 'white', color = 'black') +
-  geom_node_text(aes(label=NA), size = 3) +
-  theme_void()
-
-#Producing graph with only actors who have more then one connection
-par(mar = c(0,0,0,0))
-ll <- layout.auto(actorNetwork_small)
-
-plot(actorNetwork, 
-     layout=ll,
-     vertex.label= NA,
-     vertex.size=5)
-```
-
-
 
 ```{r}
 ##possibly extra example 
-
-#install.packages("visNetwork")
-#install.packages('DT')
-library(tidyverse)
-library(igraph)                    
-library(visNetwork)            
-library(DT)
-library(plotly)
 
 ###getting data files 
 hp_links <- read_csv("relations.csv")
@@ -250,7 +193,6 @@ visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>%
 ```
 
 ```{r}
-
 Actors <- top %>% 
   select(Actor1:Actor2, Title) %>%  
   pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
@@ -324,7 +266,7 @@ edges <- data.frame(from = huge_links$Source, to=huge_links$Target)
 
 finalnodes<- as.data.frame(huge_nodes[,-1])
 colnames(finalnodes) <- (c("id", "lable", "title", "degree", "value"))
-View(finalnodes)
+#View(finalnodes)
 
 huge_nodes <- as.data.frame(huge_nodes[,-1])
 colnames(huge_nodes) <- (c("id", "label", "title", "degree", "value"))
@@ -336,8 +278,123 @@ visNetwork(nodes=huge_nodes, edges, main = "large Network Diagram") %>%
 
 ```
 
+```{r}
+#Producing data frame with just actors with more then one connection
+actorswide2 <- tibble(actorswide)
+unique_actors1 <- data_frame("actor1" = unique(actorswide2$Actor1)) 
+unique_actors1 <- unique_actors1 %>% arrange(actor1)
+unique_actors1$connections <- table(actorswide2$Actor1)
+unique_actors2 <- data_frame("actor1" = unique(actorswide2$Actor2)) 
+unique_actors2 <- unique_actors2 %>% arrange(actor1)
+unique_actors2$connections <- table(actorswide2$Actor2)
+unique_1<- rbind(anti_join(unique_actors1, unique_actors2, "actor1"), anti_join(unique_actors2, unique_actors1, "actor1")) 
+unique_1 <- unique_1 %>% filter(connections == "1")
+actorswide2$tf <- actorswide2$Actor1 %in% unique_1$actor1
+actorswide2$tf2 <- actorswide2$Actor2 %in% unique_1$actor1
+actorswide2 <- actorswide2 %>% filter(tf == FALSE | tf2 == FALSE)
+```
+
+```{r}
+#Producing data frame with only actors who have more then one connection
+Actors_small <- actorswide2 %>% 
+  select(Actor1:Actor2) %>%  
+  pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
+  select(-"Remove")
+Actors_small<- distinct(Actors_small)
+
+#Producing actor network plot 
+#Input:
+  #d: data frame with top actor linked the 2nd, 3rd and 4th actors divided out by movie
+  #vertices: Just a list of all of the actors in movies 
+  #direct = FALSE due to multiple actors in multiple movies and aren't directed linked to every other actor 
+#Output: list of actors and who they are related to 
+actorNetwork_small <- graph_from_data_frame(d=actorswide2, vertices=Actors_small, directed=FALSE)
+
+#Producing graph with only actors who have more then one connection
+ggraph(actorNetwork_small)+
+  geom_edge_link(alpha = 0.5) +     
+  geom_node_point(size = 0.5, shape = 21, stroke = 1,
+                  fill = 'white', color = 'black') +
+  geom_node_text(aes(label=NA), size = 3) +
+  theme_void()
+
+#Producing graph with only actors who have more then one connection
+par(mar = c(0,0,0,0))
+ll <- layout.auto(actorNetwork_small)
+
+plot(actorNetwork, 
+     layout=ll,
+     vertex.label= NA,
+     vertex.size=5)
+```
+
+```{r}
+#Adding IDs to actorswide
+Actors_small$ID <- seq(1:730)
+#ID1
+colnames(actorswide2) <- c("Actor", "Actor2")
+merged1_small <- merge(Actors_small, actorswide2, by="Actor")
+#ID2
+colnames(merged1_small) <- c("Actor1", "ID1", "Actor")
+merged2_small <- merge(Actors_small, merged1_small, by="Actor")
+
+finalmerged_small <- select(merged2_small, c(2,4))
+colnames(finalmerged_small) <- c("Source", "Target")
+
+nodes_small <- select(Actors_small, c(1,2))
+```
+
+```{r}
+small_links <- finalmerged_small
+small_nodes <- nodes_small
 
 
+##creating network
+small_network <- graph_from_data_frame(small_links,
+                                    vertices= small_nodes$ID,
+                                    directed = F)
+small_network %>%   
+  edge_density() 
+
+
+small_network %>% 
+  distances() %>% 
+  as.vector() %>%              
+  as_tibble() %>%              
+  plot_ly(x = ~value) %>% 
+  add_histogram()
+
+small_network %>% 
+  get_diameter() %>% 
+  length()
+
+small_nodes <- small_nodes %>%
+  mutate(label = Actor) %>% 
+  mutate(title = Actor) %>% 
+  mutate(degree= degree(small_network)) %>% 
+  mutate(value = degree)
+
+small_links <- small_links %>% 
+  mutate(betweenness= edge_betweenness(small_network)) %>% 
+  mutate(value= betweenness)
+
+
+
+edges <- data.frame(from = small_links$Source, to=small_links$Target)
+
+finalnodes<- as.data.frame(small_nodes[,-1])
+colnames(finalnodes) <- (c("id", "lable", "title", "degree", "value"))
+#View(finalnodes)
+
+small_nodes <- as.data.frame(small_nodes[,-1])
+colnames(small_nodes) <- (c("id", "label", "title", "degree", "value"))
+
+
+visNetwork(nodes=small_nodes, edges, main = "Small Network Diagram") %>% 
+  visIgraphLayout(layout = "layout_nicely") %>% 
+  visOptions(highlightNearest = T, nodesIdSelection = T)
+
+```
 
 
 
