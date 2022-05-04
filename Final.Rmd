@@ -1,14 +1,18 @@
-
+---
 title: "Final"
-author: "Emily Mauch"
+author: "Anya Harrington, Allison Kriens, Anna Koblitz, Emily Mauch"
 date: "4/18/2022"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
   word_document: default
+---
 
 
-#Background
+
+### Background
+
+
 -Information from the top 1000 movies was pulled from the Internet Movies Database (IMDb)
   - Movie Title
   - Year 
@@ -18,15 +22,21 @@ output:
   - Number of Votes (Determined Rank)
   - Gross
   
+  
 - Movie rank was determined via popular vote 
-  -Popular vote is determined by how many people visit the IMDb page for a specific movie each week (Focuses on recent popular movies)
-  - User rank is determined by how IMDb users rank specific movies (Focuses on the most popular movies of all time)
+
+
+-Popular vote is determined by how many people visit the IMDb page for a specific movie each week (Focuses on recent popular movies)
+
+
+- User rank is determined by how IMDb users rank specific movies (Focuses on the most popular movies of all time)
+
   
 - Goal: 
   -Create a actor network which connects based on movie costars
-  -Find the Hanky Number (The number of actors between a specific person and Tom Hanks)
-
-
+  -Find the Hanky Number (The number of actors between a specific person and Tom Hanks)  
+<br>
+<br>
 ```{r Packages to install, eval=FALSE, include=FALSE}
 
 ##installing packages 
@@ -161,46 +171,28 @@ ll <- layout.auto(actorNetwork)
 
 ```
 
+### Takeaways from static network of all actors:
 
-```{r echo=FALSE, message=FALSE}
-##possibly extra example 
-## example modified from http://rstudio-pubs-static.s3.amazonaws.com/472488_eaddd648192d41ec9d508267ea592bf9.html
-
-###getting data files, of harry potter characters and relationship connectivity
-hp_links <- read_csv("relations.csv")
-hp_nodes <- read_csv("characters.csv")
-#View(hp_nodes)
-
-##creating network
-hp_network <- graph_from_data_frame(hp_links,
-                                    vertices= hp_nodes,
-                                    directed = F)
-
-## Creating nodes and assigining lables and titles for future use 
-hp_nodes <- hp_nodes %>%
-  mutate(label = name) %>% 
-  mutate(title = name) %>% 
-  mutate(degree= degree(hp_network)) %>% 
-  mutate(value = degree)
-## Creating links for connections
-hp_links <- hp_links %>% 
-  mutate(betweenness= edge_betweenness(hp_network)) %>% 
-  mutate(value= betweenness)
+-Very many actors with only one or two connections, this led to many difficulties in forming a cohesive web.
 
 
-##setting to and from values for edges
-edges <- data.frame(from = hp_links$source, to=hp_links$target)
+
+### Brief Methods:
 
 
-#View(hp_nodes)
-#View(hp_links)
-##plotting interactive network
-visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>% 
-  visIgraphLayout(layout = "layout_nicely") %>% 
-  visOptions(highlightNearest = T, nodesIdSelection = T)
+-Scrape data
 
 
-```
+-Using R network and graphing functions produce plot.
+
+
+-This plot was fairly automated using functions already built into R. 
+  
+    
+    
+<br>
+<br>
+
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 ##Selecting actor1 actor 2 and title from top dataset
@@ -280,6 +272,83 @@ visNetwork(nodes=huge_nodes, edges, main = "Large Network Diagram") %>%
 
 ```
 
+### Key takeways from interactive plot of all actors:
+
+
+-Interactivity is added to get a better grasp on the data set.
+
+
+-Allows for viewing specific connections and further exploration of data.
+
+
+### Brief Methods:
+
+
+-Each actor was assigned a number ID, and these actors formed nodes or dots on the graph.
+
+
+-Data was manipulated to form a data set with an ID "source" and ID "target" for those who worked together on a film. 
+
+-From there, we were able to produce an interactive plot using determined connections.
+
+<br>
+<br>
+
+
+```{r echo=FALSE, message=FALSE}
+##possibly extra example 
+## example modified from http://rstudio-pubs-static.s3.amazonaws.com/472488_eaddd648192d41ec9d508267ea592bf9.html
+
+###getting data files, of harry potter characters and relationship connectivity
+hp_links <- read_csv("relations.csv")
+hp_nodes <- read_csv("characters.csv")
+#View(hp_nodes)
+
+##creating network
+hp_network <- graph_from_data_frame(hp_links,
+                                    vertices= hp_nodes,
+                                    directed = F)
+
+## Creating nodes and assigining lables and titles for future use 
+hp_nodes <- hp_nodes %>%
+  mutate(label = name) %>% 
+  mutate(title = name) %>% 
+  mutate(degree= degree(hp_network)) %>% 
+  mutate(value = degree)
+## Creating links for connections
+hp_links <- hp_links %>% 
+  mutate(betweenness= edge_betweenness(hp_network)) %>% 
+  mutate(value= betweenness)
+
+
+##setting to and from values for edges
+edges <- data.frame(from = hp_links$source, to=hp_links$target)
+
+
+#View(hp_nodes)
+#View(hp_links)
+##plotting interactive network
+visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>% 
+  visIgraphLayout(layout = "layout_nicely") %>% 
+  visOptions(highlightNearest = T, nodesIdSelection = T)
+
+
+```
+
+### Reasoning Behind Harry Potter Network:
+
+
+-Due to lack of connectivity in original data set, we decided to explore an extra set of data.
+
+
+-As it is based upon a series, it is, as expected, more intertwined. 
+
+
+-This provided us with a good micro example, to move forward with our original data set. 
+
+<br>
+<br>
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Producing data frame with just actors with more then one connection
 actorswide2 <- tibble(actorswide)
@@ -327,6 +396,14 @@ ll <- layout.auto(actorNetwork_small)
 
 
 ```
+
+### Key takeaways from static network including actors with more than one connection:
+
+
+-Reflects same idea as above, but actors who were only connected to their costar have been removed. 
+<br>
+<br>
+<br>
 
 ```{r, include=FALSE}
 #Adding IDs to actorswide
@@ -389,61 +466,14 @@ visNetwork(nodes=small_nodes, edges, main = "Actors With More Than One Connectio
 
 ```
 
-```{r include=FALSE, message=FALSE, warning=FALSE}
-##cacluation bacon score for harry potter dataset, number of connections away for Harry Potter
-baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], to=V(hp_network), weights=NA))
-##taking the transpose as making it a dataframe
-baconhp <- as.data.frame(t(baconhp))
-baconhp <- tibble::rownames_to_column(baconhp, "Name")
-colnames(baconhp) <- c("Name", "Score")
-
-#View(baconhp)
-##calculating bacon score for network with more than one connection, had to begin with the ID because of how data was formatted but, this is steps away from Tom Hanks
-baconsmallnet <- as.data.frame(distances(small_network, v=V(small_network)["70"], to=V(small_network), weights=NA))
-
-names(baconsmallnet)<- NULL
-##adding in IDS
-baconsmallnet[nrow(baconsmallnet) + 1,] = seq(1:700)
 
 
-
-names(baconsmallnet)<- NULL
-
-
-baconsmallnet <- t(baconsmallnet)
-#View(baconsmallnet)
-colnames(baconsmallnet) <- c("Score", "ID")
-
-##merging bacon score to correct actor
-mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
-mergedbacon <- mergedbacon[,-1]
-#View(mergedbacon)
-#View(baconsmallnet)
-colnames(baconsmallnet) <- c("Score", "ID")
+### Key takeaways from interactive network including actors with more than one connection:
 
 
-mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
-mergedbacon<- mergedbacon[,-1]
-
-#View(mergedbacon)
-
-```
-
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-## formating interactive tables as a way to view bacon scores 
-library(reactable)
-
-library(reactable)
-
-reactable(mergedbacon, filterable = TRUE, minRows = 1)
-reactable(baconhp, filterable = TRUE, minRows = 1)
-
-```
-
-
+-As before, we are able to see more in depth into the true social network using the interactive features.
+<br>
+<br>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 ##For a specific genre
@@ -530,6 +560,95 @@ visNetwork(nodes=huge_nodesdrama, edges, main = "Drama Network Diagram") %>%
 ```
 
 
+## Key takeaways from interactive network including actors who acted within the drama genre:
+
+
+-As a surprise when filtered by genre, we didn't see any more connectivty than we did with the data as a whole.
+<br>
+<br>
+<br>
+
+```{r include=FALSE, message=FALSE, warning=FALSE}
+##cacluation bacon score for harry potter dataset, number of connections away for Harry Potter
+hp_network <- graph_from_data_frame(hp_links,
+                                    vertices= hp_nodes,
+                                    directed = F)
+
+small_network <- graph_from_data_frame(small_links,
+                                    vertices= small_nodes$ID,
+                                    directed = F)
+
+
+baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], to=V(hp_network), weights=NA))
+##taking the transpose as making it a dataframe
+baconhp <- as.data.frame(t(baconhp))
+baconhp <- tibble::rownames_to_column(baconhp, "Name")
+colnames(baconhp) <- c("Name", "Score")
+
+#View(baconhp)
+##calculating bacon score for network with more than one connection, had to begin with the ID because of how data was formatted but, this is steps away from Tom Hanks
+baconsmallnet <- as.data.frame(distances(small_network, v=V(small_network)["70"], to=V(small_network), weights=NA))
+
+names(baconsmallnet)<- NULL
+##adding in IDS
+baconsmallnet[nrow(baconsmallnet) + 1,] = seq(1:700)
+
+
+
+names(baconsmallnet)<- NULL
+
+
+baconsmallnet <- t(baconsmallnet)
+#View(baconsmallnet)
+colnames(baconsmallnet) <- c("Score", "ID")
+
+##merging bacon score to correct actor
+mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
+mergedbacon <- mergedbacon[,-1]
+#View(mergedbacon)
+#View(baconsmallnet)
+colnames(baconsmallnet) <- c("Score", "ID")
+
+
+mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
+mergedbacon<- mergedbacon[,-1]
+
+#View(mergedbacon)
+
+```
+
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+## formating interactive tables as a way to view bacon scores 
+library(reactable)
+#install.packages("reactablefmtr")
+library(reactablefmtr)
+
+reactable(mergedbacon, filterable = TRUE, minRows = 1) %>% add_title("Steps Away From Tom Hanks aka Hanky Score", font_size=18, align="center")
+
+
+## formating interactive tables as a way to view bacon scores 
+reactable(baconhp, filterable = TRUE, minRows = 1) %>% add_title("Steps Away From Harry Potter", font_size=18, align="center")
+
+```
+
+
+```
+
+
+## A few concluding points :
+
+
+-To our surprise, there are fewer connections between actors in the top 1000 movies than anticipated. This could be due to time range or even just the diverse pool of actors that we have today.
+
+-As we saw in the Harry Potter example, we can visualize a more cohesive network when there are more connections present. 
+
+-Additionally, the connectivity score in the Harry Potter network were no score of infinity like in the actors data set. This tells us that everyone in the Harry Potter data set is somehow connected to Harry Potter. This is not the case within the actors data set, meaning not everyone is connected to Tom Hanks even if they do have more than one connection. 
+
+-In general, interactiveness allows for more in depth exploration while also not causing things (plots or networks) to appear overcrowded. 
 
 
 
