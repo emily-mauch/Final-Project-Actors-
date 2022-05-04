@@ -17,6 +17,16 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("visNetwork")
 #install.packages('DT')
 
+<<<<<<< HEAD
+=======
+=======
+#install.packages("naniar")
+#install.packages("igraph")
+#install.packages("ggraph")
+#install.packages("visNetwork")
+#install.packages('DT')
+>>>>>>> 1800b34eb65db45bae9ae10abb418fc2c2eefbea
+>>>>>>> 4d50854ac4f42fbc74a3e8411020b7a9b27f9a92
 ```
 
 ```{r Packages to open, include=FALSE}
@@ -406,7 +416,7 @@ baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], 
 
 baconhp <- as.data.frame(t(baconhp))
 baconhp <- tibble::rownames_to_column(baconhp, "Name")
-colnames(baconhp) <- c("name", "score")
+colnames(baconhp) <- c("Name", "Score")
 
 #View(baconhp)
 
@@ -429,10 +439,12 @@ mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
 mergedbacon <- mergedbacon[,-1]
 #View(mergedbacon)
 #View(baconsmallnet)
-colnames(baconsmallnet) <- c("score", "ID")
+colnames(baconsmallnet) <- c("Score", "ID")
 
 
 mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
+mergedbacon<- mergedbacon[,-1]
+
 #View(mergedbacon)
 
 ```
@@ -496,8 +508,10 @@ colnames(finalmergeddrama) <- c("Source", "Target")
 hugenodesdrama <- select(dramaActors, c(1,2))
 colnames(hugenodesdrama) <- c("Actor", "ID")
 
+
 #View(hugenodesdrama)
 #View(finalmergeddrama)
+
 
 
 huge_linksdrama <- finalmergeddrama
@@ -552,7 +566,7 @@ visNetwork(nodes=huge_nodesdrama, edges, main = "Drama Network Diagram") %>%
 ```
 
 
-```{r}
+```{r, echo=FALSE}
 drama <- top  %>%
   select(Title, Actor1:Actor2, Genre1) %>%
   filter(Genre1 == "Drama")
@@ -641,7 +655,7 @@ visNetwork(nodes=huge_nodesdrama, edges, main = "Drama Network Diagram") %>%
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 drama <- top  %>%
   select(Title, Actor1:Actor2, Genre1) %>%
   filter(Genre1 == "Drama")
@@ -726,7 +740,6 @@ colnames(huge_nodesdrama) <- (c("id", "label", "title", "degree", "value"))
 visNetwork(nodes=huge_nodesdrama, edges, main = "Drama Network Diagram") %>% 
   visIgraphLayout(layout = "layout_nicely") %>% 
   visOptions(highlightNearest = T, nodesIdSelection = T)
-
 
 
 
