@@ -430,11 +430,18 @@ View(mergedbacon)
 
 ```
 
-```{r}
+
+```{r, include=FALSE}
 #install.packages("reactable")
 library(reactable)
 
 reactable(mergedbacon)
+reactable(baconhp)
+```
+
+
+
+```{r}
 
 reactable(mergedbacon, filterable = TRUE, minRows = 1)
 reactable(baconhp, filterable = TRUE, minRows = 1)
@@ -443,7 +450,9 @@ reactable(baconhp, filterable = TRUE, minRows = 1)
 ```
 
 ```{r}
-##
+##For a specific genre
+
+
 ```
 
 
