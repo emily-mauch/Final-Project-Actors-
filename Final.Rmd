@@ -402,6 +402,11 @@ visNetwork(nodes=small_nodes, edges, main = "Small Network Diagram") %>%
 
 ```{r}
 baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], to=V(hp_network), weights=NA))
+
+baconhp <- as.data.frame(t(baconhp))
+baconhp <- tibble::rownames_to_column(baconhp, "Name")
+colnames(baconhp) <- c("name", "score")
+
 View(baconhp)
 
 baconsmallnet <- as.data.frame(distances(small_network, v=V(small_network)["70"], to=V(small_network), weights=NA))
