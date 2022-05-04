@@ -405,7 +405,7 @@ baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], 
 
 baconhp <- as.data.frame(t(baconhp))
 baconhp <- tibble::rownames_to_column(baconhp, "Name")
-colnames(baconhp) <- c("name", "score")
+colnames(baconhp) <- c("Name", "Score")
 
 View(baconhp)
 
@@ -421,7 +421,7 @@ names(baconsmallnet)<- NULL
 
 baconsmallnet <- t(baconsmallnet)
 View(baconsmallnet)
-colnames(baconsmallnet) <- c("score", "ID")
+colnames(baconsmallnet) <- c("Score", "ID")
 
 
 mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
@@ -440,6 +440,10 @@ reactable(mergedbacon, filterable = TRUE, minRows = 1)
 reactable(baconhp, filterable = TRUE, minRows = 1)
 
 
+```
+
+```{r}
+##
 ```
 
 
