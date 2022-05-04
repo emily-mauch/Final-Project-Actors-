@@ -1,9 +1,28 @@
 ---
-title: "Final"
-author: "Emily Mauch"
-date: "4/18/2022"
+title: "Actors Network - STAT345 Final Project"
+author: "Anya Harrington, Allison Kriens, Anna Koblitz, Emily Mauch"
+date: "5/6/2022"
 output: html_document
 ---
+
+#Background
+-Information from the top 1000 movies was pulled from the Internet Movies Database (IMDb)
+  - Movie Title
+  - Year 
+  - Genre 
+  - Director(s)
+  - 2 Leading Actors
+  - Number of Votes (Determined Rank)
+  - Gross
+  
+- Movie rank was determined via popular vote 
+  -Popular vote is determined by how many people visit the IMDb page for a specific movie each week (Focuses on recent popular movies)
+  - User rank is determined by how IMDb users rank specific movies (Focuses on the most popular movies of all time)
+  
+- Goal: 
+  -Create a actor network which connects based on movie costars
+  -Find the Hanky Number (The number of actors between a specific person and Tom Hanks)
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -450,7 +469,10 @@ mergedbacon<- mergedbacon[,-1]
 ```
 
 ```{r}
+<<<<<<< HEAD
+=======
 #install.packages("reactable")
+>>>>>>> 4d50854ac4f42fbc74a3e8411020b7a9b27f9a92
 library(reactable)
 
 reactable(mergedbacon)
@@ -460,12 +482,8 @@ reactable(baconhp)
 
 
 ```{r, echo=FALSE}
-
-
 reactable(mergedbacon, filterable = TRUE, minRows = 1)
 reactable(baconhp, filterable = TRUE, minRows = 1)
-
-
 ```
 
 
@@ -740,9 +758,17 @@ colnames(huge_nodesdrama) <- (c("id", "label", "title", "degree", "value"))
 visNetwork(nodes=huge_nodesdrama, edges, main = "Drama Network Diagram") %>% 
   visIgraphLayout(layout = "layout_nicely") %>% 
   visOptions(highlightNearest = T, nodesIdSelection = T)
+<<<<<<< HEAD
+=======
 
 
 
 ```
+
+<<<<<<< HEAD
+=======
+>>>>>>> 4d50854ac4f42fbc74a3e8411020b7a9b27f9a92
+```
+>>>>>>> d593d82274e68069d09ab9d58256f33f99e9179c
 
 
