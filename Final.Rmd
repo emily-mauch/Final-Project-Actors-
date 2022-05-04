@@ -40,7 +40,7 @@ data <- function(x){
   top_50 <- html_nodes(html, ".sort-num_votes-visible , .text-muted+ p , .genre , .unbold , .lister-item-header a")
   a <- html_text(top_50) 
   b <- str_replace_all(a, "[\r\n]" , "")
-  c <- str_replace_all(b, "[ ]+" , "")
+  c <- str_squish(b)
   d <- gsub("[()]", "", c)   
   x <- str_replace_all(d, "[I]+", "")
   as.data.frame(matrix(x, ncol = 6, nrow = 50, byrow= TRUE))
@@ -210,7 +210,7 @@ distinctactors <- distinct(distinctactors, Actor)
 
 
 
-distinctactors$ID <- seq(1:1304)
+distinctactors$ID <- seq(1:1486)
 distinctactors$Actor2 <- distinctactors$Actor
 colnames(distinctactors) <- c("Actor1", "ID", "Actor2")
 #View(distinctactors)
@@ -330,7 +330,7 @@ plot(actorNetwork,
 
 ```{r}
 #Adding IDs to actorswide
-Actors_small$ID <- seq(1:730)
+Actors_small$ID <- seq(1:700)
 #ID1
 colnames(actorswide2) <- c("Actor", "Actor2")
 merged1_small <- merge(Actors_small, actorswide2, by="Actor")
@@ -412,7 +412,7 @@ View(baconhp)
 baconsmallnet <- as.data.frame(distances(small_network, v=V(small_network)["70"], to=V(small_network), weights=NA))
 
 names(baconsmallnet)<- NULL
-baconsmallnet[nrow(baconsmallnet) + 1,] = seq(1:730)
+baconsmallnet[nrow(baconsmallnet) + 1,] = seq(1:700)
 
 
 
@@ -430,7 +430,7 @@ View(mergedbacon)
 ```
 
 ```{r}
-#install.packages("reactable")
+install.packages("reactable")
 library(reactable)
 
 reactable(mergedbacon)
