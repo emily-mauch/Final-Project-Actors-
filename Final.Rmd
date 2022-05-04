@@ -2,9 +2,7 @@
 title: "Final"
 author: "Emily Mauch"
 date: "4/18/2022"
-output:
-  html_document:
-    df_print: paged
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -17,7 +15,6 @@ install.packages("igraph")
 install.packages("ggraph")
 install.packages("visNetwork")
 install.packages('DT')
-
 ```
 
 ```{r Packages to open, include=FALSE}
@@ -148,7 +145,7 @@ plot(actorNetwork,
 ###getting data files 
 hp_links <- read_csv("relations.csv")
 hp_nodes <- read_csv("characters.csv")
-#View(hp_nodes)
+View(hp_nodes)
 
 ##creating network
 hp_network <- graph_from_data_frame(hp_links,
@@ -184,8 +181,8 @@ hp_links <- hp_links %>%
 edges <- data.frame(from = hp_links$source, to=hp_links$target)
 
 
-#View(hp_nodes)
-#View(hp_links)
+View(hp_nodes)
+View(hp_links)
 
 visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>% 
   visIgraphLayout(layout = "layout_nicely") %>% 
@@ -352,7 +349,7 @@ nodes_small <- select(Actors_small, c(1,2))
 ```{r}
 small_links <- finalmerged_small
 small_nodes <- nodes_small
-#View(small_nodes)
+View(small_nodes)
 
 
 ##creating network
@@ -409,7 +406,7 @@ baconhp <- as.data.frame(t(baconhp))
 baconhp <- tibble::rownames_to_column(baconhp, "Name")
 colnames(baconhp) <- c("name", "score")
 
-#View(baconhp)
+View(baconhp)
 
 baconsmallnet <- as.data.frame(distances(small_network, v=V(small_network)["70"], to=V(small_network), weights=NA))
 
@@ -422,17 +419,17 @@ names(baconsmallnet)<- NULL
 
 
 baconsmallnet <- t(baconsmallnet)
-#View(baconsmallnet)
+View(baconsmallnet)
 colnames(baconsmallnet) <- c("score", "ID")
 
 
 mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
-#View(mergedbacon)
+View(mergedbacon)
 
 ```
 
 ```{r}
-#install.packages("reactable")
+install.packages("reactable")
 library(reactable)
 
 reactable(mergedbacon)
@@ -442,4 +439,7 @@ reactable(baconhp, filterable = TRUE, minRows = 1)
 
 
 ```
+
+
+>>>>>>> bc394c71cecc088718dbaa99ad1dfaa312412ebd
 
