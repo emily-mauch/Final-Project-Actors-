@@ -342,6 +342,9 @@ finalmerged_small <- select(merged2_small, c(2,4))
 colnames(finalmerged_small) <- c("Source", "Target")
 
 nodes_small <- select(Actors_small, c(1,2))
+
+
+#View(Actors_small)
 ```
 
 ```{r}
@@ -402,9 +405,22 @@ baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], 
 View(baconhp)
 
 baconsmallnet <- as.data.frame(distances(small_network, v=V(small_network)["70"], to=V(small_network), weights=NA))
+
+names(baconsmallnet)<- NULL
+baconsmallnet[nrow(baconsmallnet) + 1,] = seq(1:730)
+
+
+
+names(baconsmallnet)<- NULL
+
+
+baconsmallnet <- t(baconsmallnet)
 View(baconsmallnet)
+colnames(baconsmallnet) <- c("score", "ID")
 
 
+mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
+View(mergedbacon)
 
 ```
 
