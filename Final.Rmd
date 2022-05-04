@@ -10,20 +10,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r Packages to install, eval=FALSE}
-<<<<<<< HEAD
+
 #install.packages("naniar")
 #install.packages("igraph")
 #install.packages("ggraph")
 #install.packages("visNetwork")
 #install.packages('DT')
 
-=======
-install.packages("naniar")
-install.packages("igraph")
-install.packages("ggraph")
-install.packages("visNetwork")
-install.packages('DT')
->>>>>>> 1800b34eb65db45bae9ae10abb418fc2c2eefbea
 ```
 
 ```{r Packages to open, include=FALSE}
@@ -445,7 +438,7 @@ mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
 ```
 
 ```{r}
-install.packages("reactable")
+#install.packages("reactable")
 library(reactable)
 
 reactable(mergedbacon)
@@ -496,15 +489,15 @@ mergedint <-mergeddrama1[,-3]
 colnames(mergedint) <- c("Actor1", "ID", "Actor2")
 mergeddrama2 <- merge(dramaActors, mergedint, by="Actor2")
 finalmergeddrama <- select(mergeddrama2, c(3,5))
-View(finalmergeddrama)
+#View(finalmergeddrama)
 
 colnames(finalmergeddrama) <- c("Source", "Target")
 #View(finalmerged)
 hugenodesdrama <- select(dramaActors, c(1,2))
 colnames(hugenodesdrama) <- c("Actor", "ID")
 
-View(hugenodesdrama)
-View(finalmergeddrama)
+#View(hugenodesdrama)
+#View(finalmergeddrama)
 
 
 huge_linksdrama <- finalmergeddrama
@@ -587,15 +580,15 @@ mergedint <-mergeddrama1[,-3]
 colnames(mergedint) <- c("Actor1", "ID", "Actor2")
 mergeddrama2 <- merge(dramaActors, mergedint, by="Actor2")
 finalmergeddrama <- select(mergeddrama2, c(3,5))
-View(finalmergeddrama)
+#View(finalmergeddrama)
 
 colnames(finalmergeddrama) <- c("Source", "Target")
 #View(finalmerged)
 hugenodesdrama <- select(dramaActors, c(1,2))
 colnames(hugenodesdrama) <- c("Actor", "ID")
 
-View(hugenodesdrama)
-View(finalmergeddrama)
+#View(hugenodesdrama)
+#View(finalmergeddrama)
 
 
 huge_linksdrama <- finalmergeddrama
@@ -676,15 +669,15 @@ mergedint <-mergeddrama1[,-3]
 colnames(mergedint) <- c("Actor1", "ID", "Actor2")
 mergeddrama2 <- merge(dramaActors, mergedint, by="Actor2")
 finalmergeddrama <- select(mergeddrama2, c(3,5))
-View(finalmergeddrama)
+#View(finalmergeddrama)
 
 colnames(finalmergeddrama) <- c("Source", "Target")
 #View(finalmerged)
 hugenodesdrama <- select(dramaActors, c(1,2))
 colnames(hugenodesdrama) <- c("Actor", "ID")
 
-View(hugenodesdrama)
-View(finalmergeddrama)
+#View(hugenodesdrama)
+#View(finalmergeddrama)
 
 
 huge_linksdrama <- finalmergeddrama
@@ -738,7 +731,5 @@ visNetwork(nodes=huge_nodesdrama, edges, main = "Drama Network Diagram") %>%
 
 
 ```
-```{r}
 
-```
 
