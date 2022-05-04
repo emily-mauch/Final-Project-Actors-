@@ -42,7 +42,7 @@ data <- function(x){
   top_50 <- html_nodes(html, ".sort-num_votes-visible , .text-muted+ p , .genre , .unbold , .lister-item-header a")
   a <- html_text(top_50) 
   b <- str_replace_all(a, "[\r\n]" , "")
-  c <- str_replace_all(b, "[ ]+" , "")
+  c <- str_squish(b)
   d <- gsub("[()]", "", c)   
   x <- str_replace_all(d, "[I]+", "")
   as.data.frame(matrix(x, ncol = 6, nrow = 50, byrow= TRUE))
@@ -212,7 +212,7 @@ distinctactors <- distinct(distinctactors, Actor)
 
 
 
-distinctactors$ID <- seq(1:1304)
+distinctactors$ID <- seq(1:1486)
 distinctactors$Actor2 <- distinctactors$Actor
 colnames(distinctactors) <- c("Actor1", "ID", "Actor2")
 #View(distinctactors)
@@ -332,7 +332,7 @@ plot(actorNetwork,
 
 ```{r}
 #Adding IDs to actorswide
-Actors_small$ID <- seq(1:730)
+Actors_small$ID <- seq(1:700)
 #ID1
 colnames(actorswide2) <- c("Actor", "Actor2")
 merged1_small <- merge(Actors_small, actorswide2, by="Actor")
@@ -344,11 +344,15 @@ finalmerged_small <- select(merged2_small, c(2,4))
 colnames(finalmerged_small) <- c("Source", "Target")
 
 nodes_small <- select(Actors_small, c(1,2))
+
+
+#View(Actors_small)
 ```
 
 ```{r}
 small_links <- finalmerged_small
 small_nodes <- nodes_small
+View(small_nodes)
 
 
 ##creating network
@@ -398,6 +402,46 @@ visNetwork(nodes=small_nodes, edges, main = "Small Network Diagram") %>%
 
 ```
 
+```{r}
+baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], to=V(hp_network), weights=NA))
+
+baconhp <- as.data.frame(t(baconhp))
+baconhp <- tibble::rownames_to_column(baconhp, "Name")
+colnames(baconhp) <- c("name", "score")
+
+View(baconhp)
+
+baconsmallnet <- as.data.frame(distances(small_network, v=V(small_network)["70"], to=V(small_network), weights=NA))
+
+names(baconsmallnet)<- NULL
+baconsmallnet[nrow(baconsmallnet) + 1,] = seq(1:700)
+
+
+
+names(baconsmallnet)<- NULL
+
+
+baconsmallnet <- t(baconsmallnet)
+View(baconsmallnet)
+colnames(baconsmallnet) <- c("score", "ID")
+
+
+mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
+View(mergedbacon)
+
+```
+
+```{r}
+install.packages("reactable")
+library(reactable)
+
+reactable(mergedbacon)
+
+reactable(mergedbacon, filterable = TRUE, minRows = 1)
+reactable(baconhp, filterable = TRUE, minRows = 1)
+
+
+```
 
 
 >>>>>>> bc394c71cecc088718dbaa99ad1dfaa312412ebd
