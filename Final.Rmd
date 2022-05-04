@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r Packages to install, include=FALSE}
 install.packages("naniar")
 install.packages("igraph")
+install.packages("ggraph")
 ```
 
 ```{r Packages to open, include=FALSE}
@@ -60,15 +61,15 @@ r <- data("https://www.imdb.com/search/title/?groups=top_1000&start=851&ref_=adv
 s <- data("https://www.imdb.com/search/title/?groups=top_1000&start=901&ref_=adv_nxt")
 t <- data("https://www.imdb.com/search/title/?groups=top_1000&start=951&ref_=adv_nxt")
 
-top_1000 <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
+top <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
 ```
 
 
 
-```{r}
+```{r warning=FALSE}
 #Formatting data frame 
 
-top <- top_1000 %>% separate(V1, c("Rank", NA), sep="[.]") %>%
+top <- top %>% separate(V1, c("Rank", NA), sep="[.]") %>%
   separate(V4, c("Genre1", "Genre2", "Genre3"), sep="[,]")%>%
   separate(V5, c("Director", "Actor"), sep = "[|]") %>%
   separate(Director, c(NA, "Director"), sep = "[:]") %>%
@@ -96,10 +97,11 @@ top_longer <- top_longer[, col_order]
 
 #Producing Data frame "Actors" contains just actors and removes all duplicates. Needed for graphing function 
 Actors <- top %>% 
-  select(Actor1:Actor2) %>%  
+  select(Actor1:Actor2, Title) %>%  
   pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
   select(-"Remove")
-Actors <-  distinct(Actors)
+#Removes duplicate actors
+Actors <- distinct(Actors, Actor)
 ```
 
 
@@ -113,3 +115,323 @@ Actors <-  distinct(Actors)
 actorNetwork <- graph_from_data_frame(d=top_longer, vertices=Actors, directed=FALSE)
 plot(actorNetwork)
 ```
+
+
+```{r}
+#Idea 1 for graph
+library(ggraph)
+ggraph(actorNetwork)+
+  geom_edge_link(alpha = 0.5) +     
+  geom_node_point(size = 0.5, shape = 21, stroke = 1,
+                  fill = 'white', color = 'black') +
+  geom_node_text(aes(label=NA), size = 3) +
+  theme_void()
+```
+
+```{r}
+#Idea 2 for graph 
+par(mar = c(0,0,0,0))
+ll <- layout.auto(actorNetwork)
+
+plot(actorNetwork, 
+     layout=ll,
+     vertex.label= NA,
+     vertex.size=5)
+```
+
+```{r}
+#Shiny App with all actors 
+
+server <- function(input, output, session) {
+   # global variable, what type of plot interaction
+    interaction_type <- "click"
+    # observe for user interaction and change the global interaction_type variable
+    observeEvent(input$user_click, interaction_type <<- "click")
+    observeEvent(input$user_brush, interaction_type <<- "brush")
+#Plot     
+    output$plot <- renderPlot({
+         par(mar = c(0,0,0,0))
+          ll <- layout.auto(actorNetwork) 
+          
+          plot(actorNetwork, 
+               layout=ll,
+               vertex.label= NA,
+               vertex.size=5)
+    })
+# generate the data to put in the table
+    dat <- reactive({
+        
+        user_brush <- input$user_brush
+        user_click <- input$user_click
+        
+        if(interaction_type == "brush") res <- brushedPoints(Actors, user_brush)
+        if(interaction_type == "click") res <- nearPoints(Actors, user_click, threshold = 10, maxpoints = 1)
+        
+        return(res)
+        
+    })
+#Making data table    
+    output$table <- DT::renderDataTable(DT::datatable(dat()[,c("Actor")]))
+    
+}
+
+#ui <- fluidPage(
+#output you actually see    
+  #  h3("Top 2 Actors from top 1000 movies"),
+    #plotOutput("plot", click = "user_click", brush = "user_brush"),
+    #DT::dataTableOutput("table")
+    
+#)
+
+#shinyApp(ui = ui, server = server)
+```
+
+
+```{r}
+#par(mar = c(0,0,0,0))
+#ll <- layout.auto(actorNetwork_50)
+
+#plot(actorNetwork_50, 
+     #layout=ll,
+     #vertex.label= NA,
+     #vertex.size=5)
+```
+
+
+```{r}
+#Below is only 50 of the movies - test to find people with only once connection 
+
+top_50 <- top_longer[1:50,]
+
+Actors_50 <- top_50 %>% 
+  pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
+  select(-"Remove")
+col_order2 <- c("Actor", "Title")
+Actors_50 <- Actors_50[, col_order2]
+Actors_50 <-  distinct(Actors_50, Actor)
+
+
+actorNetwork_50 <- graph_from_data_frame(d=top_50, vertices=Actors_50, directed=FALSE)
+```
+
+
+```{r}
+output <- c()
+```
+
+
+```{r}
+server <- function(input, output, session) {
+   # global variable, what type of plot interaction
+    interaction_type <- "click"
+    # observe for user interaction and change the global interaction_type variable
+    observeEvent(input$user_click, interaction_type <<- "click")
+    observeEvent(input$plot1_dblclick, {
+          brush <- input$plot1_brush
+            if (!is.null(brush)) {
+            ranges$x <- c(brush$xmin, brush$xmax)
+            ranges$y <- c(brush$ymin, brush$ymax)
+
+           } else {
+          ranges$x <- NULL
+          ranges$y <- NULL
+    }
+  })
+    ranges <- reactiveValues(x = NULL, y = NULL)
+    
+    output$plot <- renderPlot({
+         par(mar = c(0,0,0,0))
+          ll <- layout.auto(actorNetwork) 
+          
+          plot(actorNetwork, 
+               layout=ll,
+               vertex.label= NA,
+               vertex.size=5)
+          coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE)
+    })
+    # generate the data to put in the table
+    dat <- reactive({
+        
+        user_click <- input$user_click
+        
+
+        if(interaction_type == "click") res <- nearPoints(Actors, user_click, threshold = 10, maxpoints = 1)
+        
+        return(res)
+        
+    })
+    
+    output$table <- DT::renderDataTable(DT::datatable(dat()[,c("Actor")]))
+    
+}
+
+ui <- fluidPage(
+    
+    h3("Top 2 Actors from top 1000 movies"),
+    plotOutput("plot", click = "user_click", 
+               dblclick = "plot1_dblclick",
+                brush = brushOpts(id = "plot1_brush",
+                    resetOnNew = TRUE)),
+    DT::dataTableOutput("table")
+    
+)
+
+shinyApp(ui = ui, server = server)
+```
+```{r}
+##possibly extra example 
+
+#install.packages("visNetwork")
+#install.packages('DT')
+library(tidyverse)
+library(igraph)                    
+library(visNetwork)            
+library(DT)
+library(plotly)
+
+###getting data files 
+hp_links <- read_csv("relations.csv")
+hp_nodes <- read_csv("characters.csv")
+
+##creating network
+hp_network <- graph_from_data_frame(hp_links,
+                                    vertices= hp_nodes,
+                                    directed = F)
+hp_network %>% 
+  edge_density()
+
+
+hp_network %>% 
+  distances() %>% 
+  as.vector() %>%              
+  as_tibble() %>%              
+  plot_ly(x = ~value) %>% 
+  add_histogram()
+
+hp_network %>% 
+  get_diameter() %>% 
+  length()
+
+hp_nodes <- hp_nodes %>%
+  mutate(label = name) %>% 
+  mutate(title = name) %>% 
+  mutate(degree= degree(hp_network)) %>% 
+  mutate(value = degree)
+
+hp_links <- hp_links %>% 
+  mutate(betweenness= edge_betweenness(hp_network)) %>% 
+  mutate(value= betweenness)
+
+
+
+edges <- data.frame(from = hp_links$source, to=hp_links$target)
+
+
+View(hp_nodes)
+View(hp_links)
+
+visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>% 
+  visIgraphLayout(layout = "layout_nicely") %>% 
+  visOptions(highlightNearest = T, nodesIdSelection = T)
+
+
+```
+
+```{r}
+
+Actors <- top %>% 
+  select(Actor1:Actor2, Title) %>%  
+  pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
+  select(-"Remove")
+
+View(Actors)
+actorswide <- top %>% 
+  select(Actor1:Actor2)
+
+distinctactors <- top %>% 
+  select(Actor1:Actor2) %>%  
+  pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>%    select(-"Remove")
+#Removes duplicate actors
+distinctactors <- distinct(distinctactors, Actor)
+
+
+
+distinctactors$ID <- seq(1:1304)
+distinctactors$Actor2 <- distinctactors$Actor
+colnames(distinctactors) <- c("Actor1", "ID", "Actor2")
+View(distinctactors)
+merged1 <- merge(distinctactors, actorswide, by="Actor1")
+mergedint <-merged1[,-3]
+colnames(mergedint) <- c("Actor1", "ID", "Actor2")
+mergedint2 <- merge(distinctactors, mergedint, by="Actor2")
+
+finalmerged <- select(mergedint2, -c(1,2,4))
+colnames(finalmerged) <- c("Source", "Target")
+View(finalmerged)
+hugenodes <- select(distinctactors, c(1,2))
+colnames(hugenodes) <- c("Actor", "ID")
+View(hugenodes)
+
+
+
+huge_links <- finalmerged
+huge_nodes <- hugenodes
+
+##creating network
+huge_network <- graph_from_data_frame(hp_links,
+                                    vertices= hp_nodes,
+                                    directed = F)
+hp_network %>%   
+  edge_density() 
+
+
+hp_network %>% 
+  distances() %>% 
+  as.vector() %>%              
+  as_tibble() %>%              
+  plot_ly(x = ~value) %>% 
+  add_histogram()
+
+hp_network %>% 
+  get_diameter() %>% 
+  length()
+
+hp_nodes <- hp_nodes %>%
+  mutate(label = name) %>% 
+  mutate(title = name) %>% 
+  mutate(degree= degree(hp_network)) %>% 
+  mutate(value = degree)
+
+hp_links <- hp_links %>% 
+  mutate(betweenness= edge_betweenness(hp_network)) %>% 
+  mutate(value= betweenness)
+
+
+
+edges <- data.frame(from = hp_links$source, to=hp_links$target)
+
+
+View(hp_nodes)
+View(hp_links)
+
+visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>% 
+  visIgraphLayout(layout = "layout_nicely") %>% 
+  visOptions(highlightNearest = T, nodesIdSelection = T)
+
+```
+```{r}
+actorswide2 <- data.frame(actorswide)
+unique_actors1 <- data_frame("actor1" = unique(actorswide2$Actor1)) 
+unique_actors1 <- unique_actors1 %>% arrange(actor1)
+unique_actors1$connections <- table(actorswide2$Actor1)
+unique_actors2 <- data_frame("actor1" = unique(actorswide2$Actor2)) 
+unique_actors2 <- unique_actors2 %>% arrange(actor1)
+unique_actors2$connections <- table(actorswide2$Actor2)
+unique_1<- rbind(anti_join(unique_actors1, unique_actors2, "actor1"), anti_join(unique_actors2, unique_actors1, "actor1")) 
+unique_1 <- unique_1 %>% filter(connections == "1")
+actorswide2$tf <- actorswide2$Actor1 %in% unique_1$actor1
+actorswide2$tf2 <- actorswide2$Actor2 %in% unique_1$actor1
+actorswide2 <- actorswide2 %>% filter(tf == TRUE & tf2 == TRUE)
+```
+
+>>>>>>> bc394c71cecc088718dbaa99ad1dfaa312412ebd
