@@ -425,12 +425,13 @@ colnames(baconsmallnet) <- c("score", "ID")
 
 
 mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
+mergedbacon <- mergedbacon[,-1]
 View(mergedbacon)
 
 ```
 
 ```{r}
-install.packages("reactable")
+#install.packages("reactable")
 library(reactable)
 
 reactable(mergedbacon)
