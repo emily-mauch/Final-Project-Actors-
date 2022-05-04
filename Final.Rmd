@@ -18,11 +18,11 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages('DT')
 
 =======
-install.packages("naniar")
-install.packages("igraph")
-install.packages("ggraph")
-install.packages("visNetwork")
-install.packages('DT')
+#install.packages("naniar")
+#install.packages("igraph")
+#install.packages("ggraph")
+#install.packages("visNetwork")
+#install.packages('DT')
 >>>>>>> 1800b34eb65db45bae9ae10abb418fc2c2eefbea
 ```
 
@@ -413,7 +413,7 @@ baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], 
 
 baconhp <- as.data.frame(t(baconhp))
 baconhp <- tibble::rownames_to_column(baconhp, "Name")
-colnames(baconhp) <- c("name", "score")
+colnames(baconhp) <- c("Name", "Score")
 
 #View(baconhp)
 
@@ -436,16 +436,18 @@ mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
 mergedbacon <- mergedbacon[,-1]
 #View(mergedbacon)
 #View(baconsmallnet)
-colnames(baconsmallnet) <- c("score", "ID")
+colnames(baconsmallnet) <- c("Score", "ID")
 
 
 mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
+mergedbacon<- mergedbacon[,-1]
+
 #View(mergedbacon)
 
 ```
 
 ```{r}
-install.packages("reactable")
+#install.packages("reactable")
 library(reactable)
 
 reactable(mergedbacon)
@@ -496,15 +498,14 @@ mergedint <-mergeddrama1[,-3]
 colnames(mergedint) <- c("Actor1", "ID", "Actor2")
 mergeddrama2 <- merge(dramaActors, mergedint, by="Actor2")
 finalmergeddrama <- select(mergeddrama2, c(3,5))
-View(finalmergeddrama)
+#View(finalmergeddrama)
 
 colnames(finalmergeddrama) <- c("Source", "Target")
 #View(finalmerged)
 hugenodesdrama <- select(dramaActors, c(1,2))
 colnames(hugenodesdrama) <- c("Actor", "ID")
 
-View(hugenodesdrama)
-View(finalmergeddrama)
+
 
 
 huge_linksdrama <- finalmergeddrama
@@ -587,15 +588,15 @@ mergedint <-mergeddrama1[,-3]
 colnames(mergedint) <- c("Actor1", "ID", "Actor2")
 mergeddrama2 <- merge(dramaActors, mergedint, by="Actor2")
 finalmergeddrama <- select(mergeddrama2, c(3,5))
-View(finalmergeddrama)
+#View(finalmergeddrama)
 
 colnames(finalmergeddrama) <- c("Source", "Target")
 #View(finalmerged)
 hugenodesdrama <- select(dramaActors, c(1,2))
 colnames(hugenodesdrama) <- c("Actor", "ID")
 
-View(hugenodesdrama)
-View(finalmergeddrama)
+#View(hugenodesdrama)
+#View(finalmergeddrama)
 
 
 huge_linksdrama <- finalmergeddrama
@@ -676,15 +677,15 @@ mergedint <-mergeddrama1[,-3]
 colnames(mergedint) <- c("Actor1", "ID", "Actor2")
 mergeddrama2 <- merge(dramaActors, mergedint, by="Actor2")
 finalmergeddrama <- select(mergeddrama2, c(3,5))
-View(finalmergeddrama)
+#View(finalmergeddrama)
 
 colnames(finalmergeddrama) <- c("Source", "Target")
 #View(finalmerged)
 hugenodesdrama <- select(dramaActors, c(1,2))
 colnames(hugenodesdrama) <- c("Actor", "ID")
 
-View(hugenodesdrama)
-View(finalmergeddrama)
+#View(hugenodesdrama)
+#View(finalmergeddrama)
 
 
 huge_linksdrama <- finalmergeddrama
@@ -733,7 +734,6 @@ colnames(huge_nodesdrama) <- (c("id", "label", "title", "degree", "value"))
 visNetwork(nodes=huge_nodesdrama, edges, main = "Drama Network Diagram") %>% 
   visIgraphLayout(layout = "layout_nicely") %>% 
   visOptions(highlightNearest = T, nodesIdSelection = T)
-
 
 
 
