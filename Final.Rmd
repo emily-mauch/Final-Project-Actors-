@@ -2,7 +2,7 @@
 title: "Final"
 author: "Emily Mauch"
 date: "4/18/2022"
-output: word_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -10,12 +10,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r Packages to install, eval=FALSE}
+<<<<<<< HEAD
+#install.packages("naniar")
+#install.packages("igraph")
+#install.packages("ggraph")
+#install.packages("visNetwork")
+#install.packages('DT')
+
+=======
 install.packages("naniar")
 install.packages("igraph")
 install.packages("ggraph")
 install.packages("visNetwork")
 install.packages('DT')
-
+>>>>>>> 1800b34eb65db45bae9ae10abb418fc2c2eefbea
 ```
 
 ```{r Packages to open, include=FALSE}
@@ -30,7 +38,7 @@ library(plotly)
 ```
 
 
-```{r}
+```{r echo=FALSE}
 #Function : data
 #Input : a url to a 50 of the top 1000 movies. Selects and formats movie rank, title, year, directors/actors, votes/gross
 #Output : a data frame of 50 movies with variables above
@@ -73,7 +81,7 @@ top <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
 
 
 
-```{r warning=FALSE}
+```{r echo=FALSE, warning=FALSE}
 #Formatting data frame 
 
 top <- top %>% separate(V1, c("Rank", NA), sep="[.]") %>%
@@ -94,7 +102,7 @@ top <- top %>% separate(V1, c("Rank", NA), sep="[.]") %>%
 top_100 <- top %>% arrange(Year) %>% head(100)
 ```
 
-```{r}
+```{r, echo=FALSE}
 #Producing data frame "actors". Contains 3 rows per movie that correlates each actor in the movie to the "top" actor. Modified top for graphing 
 #Format must be "Actor1", "Actor2" then "title"
 top_longer <- top  %>% 
@@ -111,7 +119,7 @@ Actors <- top %>%
 Actors <- distinct(Actors, Actor)
 ```
 
-```{r}
+```{r, echo=FALSE}
 #Producing actor network plot 
 #Input:
   #d: data frame with top actor linked the 2nd, 3rd and 4th actors divided out by movie
@@ -140,13 +148,13 @@ plot(actorNetwork,
 ```
 
 
-```{r}
+```{r, echo=FALSE}
 ##possibly extra example 
 
 ###getting data files 
 hp_links <- read_csv("relations.csv")
 hp_nodes <- read_csv("characters.csv")
-View(hp_nodes)
+#View(hp_nodes)
 
 ##creating network
 hp_network <- graph_from_data_frame(hp_links,
@@ -182,8 +190,8 @@ hp_links <- hp_links %>%
 edges <- data.frame(from = hp_links$source, to=hp_links$target)
 
 
-View(hp_nodes)
-View(hp_links)
+#View(hp_nodes)
+#View(hp_links)
 
 visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>% 
   visIgraphLayout(layout = "layout_nicely") %>% 
@@ -192,7 +200,7 @@ visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>%
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 Actors <- top %>% 
   select(Actor1:Actor2, Title) %>%  
   pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
@@ -278,7 +286,7 @@ visNetwork(nodes=huge_nodes, edges, main = "large Network Diagram") %>%
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 #Producing data frame with just actors with more then one connection
 actorswide2 <- tibble(actorswide)
 unique_actors1 <- data_frame("actor1" = unique(actorswide2$Actor1)) 
@@ -294,7 +302,7 @@ actorswide2$tf2 <- actorswide2$Actor2 %in% unique_1$actor1
 actorswide2 <- actorswide2 %>% filter(tf == FALSE | tf2 == FALSE)
 ```
 
-```{r}
+```{r, echo=FALSE}
 #Producing data frame with only actors who have more then one connection
 Actors_small <- actorswide2 %>% 
   select(Actor1:Actor2) %>%  
@@ -328,7 +336,7 @@ plot(actorNetwork,
      vertex.size=5)
 ```
 
-```{r}
+```{r, echo=FALSE}
 #Adding IDs to actorswide
 Actors_small$ID <- seq(1:700)
 #ID1
@@ -347,10 +355,10 @@ nodes_small <- select(Actors_small, c(1,2))
 #View(Actors_small)
 ```
 
-```{r}
+```{r, echo=FALSE}
 small_links <- finalmerged_small
 small_nodes <- nodes_small
-View(small_nodes)
+#View(small_nodes)
 
 
 ##creating network
@@ -400,14 +408,14 @@ visNetwork(nodes=small_nodes, edges, main = "Small Network Diagram") %>%
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], to=V(hp_network), weights=NA))
 
 baconhp <- as.data.frame(t(baconhp))
 baconhp <- tibble::rownames_to_column(baconhp, "Name")
-colnames(baconhp) <- c("Name", "Score")
+colnames(baconhp) <- c("name", "score")
 
-View(baconhp)
+#View(baconhp)
 
 baconsmallnet <- as.data.frame(distances(small_network, v=V(small_network)["70"], to=V(small_network), weights=NA))
 
@@ -420,19 +428,24 @@ names(baconsmallnet)<- NULL
 
 
 baconsmallnet <- t(baconsmallnet)
-View(baconsmallnet)
+#View(baconsmallnet)
 colnames(baconsmallnet) <- c("Score", "ID")
 
 
 mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
 mergedbacon <- mergedbacon[,-1]
-View(mergedbacon)
+#View(mergedbacon)
+#View(baconsmallnet)
+colnames(baconsmallnet) <- c("score", "ID")
+
+
+mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
+#View(mergedbacon)
 
 ```
 
-
-```{r, include=FALSE}
-#install.packages("reactable")
+```{r}
+install.packages("reactable")
 library(reactable)
 
 reactable(mergedbacon)
@@ -441,7 +454,8 @@ reactable(baconhp)
 
 
 
-```{r}
+```{r, echo=FALSE}
+
 
 reactable(mergedbacon, filterable = TRUE, minRows = 1)
 reactable(baconhp, filterable = TRUE, minRows = 1)
@@ -449,7 +463,8 @@ reactable(baconhp, filterable = TRUE, minRows = 1)
 
 ```
 
-```{r}
+
+```{r, echo=FALSE}
 ##For a specific genre
 
 
@@ -544,4 +559,4 @@ visNetwork(nodes=huge_nodesdrama, edges, main = "Drama Network Diagram") %>%
 ```
 
 
->>>>>>> bc394c71cecc088718dbaa99ad1dfaa312412ebd
+
