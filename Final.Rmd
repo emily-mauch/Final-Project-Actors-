@@ -29,7 +29,7 @@ output:
 
 ```{r Packages to install, eval=FALSE, include=FALSE}
 
-
+##installing packages 
 
 #install.packages("naniar")
 #install.packages("igraph")
@@ -41,6 +41,7 @@ output:
 ```
 
 ```{r Packages to open, include=FALSE}
+##loading libraries
 library(tidyverse)
 library(rvest) 
 library(naniar)
@@ -68,7 +69,7 @@ data <- function(x){
   as.data.frame(matrix(x, ncol = 6, nrow = 50, byrow= TRUE))
 }
 
-
+##assiging urls
 a <- data("https://www.imdb.com/search/title/?groups=top_1000&start=1")
 b <- data("https://www.imdb.com/search/title/?groups=top_1000&start=51&ref_=adv_nxt")
 c <- data("https://www.imdb.com/search/title/?groups=top_1000&start=101&ref_=adv_nxt")
@@ -89,7 +90,7 @@ q <- data("https://www.imdb.com/search/title/?groups=top_1000&start=801&ref_=adv
 r <- data("https://www.imdb.com/search/title/?groups=top_1000&start=851&ref_=adv_nxt")
 s <- data("https://www.imdb.com/search/title/?groups=top_1000&start=901&ref_=adv_nxt")
 t <- data("https://www.imdb.com/search/title/?groups=top_1000&start=951&ref_=adv_nxt")
-
+##binding data sets together 
 top <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
 ```
 
@@ -97,6 +98,7 @@ top <- rbind(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t)
 
 ```{r echo=FALSE, warning=FALSE}
 #Formatting data frame 
+##selected genre, actors, votes, title, year, director, gross
 
 top <- top %>% separate(V1, c("Rank", NA), sep="[.]") %>%
   separate(V4, c("Genre1", "Genre2", "Genre3"), sep="[,]")%>%
@@ -113,7 +115,7 @@ top <- top %>% separate(V1, c("Rank", NA), sep="[.]") %>%
   select("Rank":"Votes", "Gross2")%>%
   rename("Gross" = "Gross2") %>%
   replace_with_na(replace = list(Gross = ""))
-top_100 <- top %>% arrange(Year) %>% head(100)
+
 ```
 
 ```{r, echo=FALSE}
@@ -143,7 +145,7 @@ Actors <- distinct(Actors, Actor)
 actorNetwork <- graph_from_data_frame(d=top_longer, vertices=Actors, directed=FALSE)
 
 
-#Graph with all actors
+#Graph with all actors, not including names, visualize all connections
 ggraph(actorNetwork)+
   geom_edge_link(alpha = 0.5) +     
   geom_node_point(size = 0.5, shape = 21, stroke = 1,
@@ -162,8 +164,9 @@ ll <- layout.auto(actorNetwork)
 
 ```{r echo=FALSE, message=FALSE}
 ##possibly extra example 
+## example modified from http://rstudio-pubs-static.s3.amazonaws.com/472488_eaddd648192d41ec9d508267ea592bf9.html
 
-###getting data files 
+###getting data files, of harry potter characters and relationship connectivity
 hp_links <- read_csv("relations.csv")
 hp_nodes <- read_csv("characters.csv")
 #View(hp_nodes)
@@ -172,30 +175,26 @@ hp_nodes <- read_csv("characters.csv")
 hp_network <- graph_from_data_frame(hp_links,
                                     vertices= hp_nodes,
                                     directed = F)
-#hp_network %>% 
-  #edge_density()
 
-
-
-
+## Creating nodes and assigining lables and titles for future use 
 hp_nodes <- hp_nodes %>%
   mutate(label = name) %>% 
   mutate(title = name) %>% 
   mutate(degree= degree(hp_network)) %>% 
   mutate(value = degree)
-
+## Creating links for connections
 hp_links <- hp_links %>% 
   mutate(betweenness= edge_betweenness(hp_network)) %>% 
   mutate(value= betweenness)
 
 
-
+##setting to and from values for edges
 edges <- data.frame(from = hp_links$source, to=hp_links$target)
 
 
 #View(hp_nodes)
 #View(hp_links)
-
+##plotting interactive network
 visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>% 
   visIgraphLayout(layout = "layout_nicely") %>% 
   visOptions(highlightNearest = T, nodesIdSelection = T)
@@ -204,15 +203,17 @@ visNetwork(nodes=hp_nodes, edges, main = "Harry Potter Network Diagram") %>%
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+##Selecting actor1 actor 2 and title from top dataset
 Actors <- top %>% 
   select(Actor1:Actor2, Title) %>%  
   pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>% 
   select(-"Remove")
 
 #View(Actors)
+##selecting only the actors
 actorswide <- top %>% 
   select(Actor1:Actor2)
-
+##creating a list of unique actors/ removing duplicate
 distinctactors <- top %>% 
   select(Actor1:Actor2) %>%  
   pivot_longer(cols= "Actor1":"Actor2",names_to= "Remove", values_to = 'Actor') %>%    select(-"Remove")
@@ -220,16 +221,18 @@ distinctactors <- top %>%
 distinctactors <- distinct(distinctactors, Actor)
 
 
-
+##assigning each distict actor an ID, merging as neccessary, to end up with a dataframe with only actor 1 ID and Actor 2 ID for use in building links later on 
 distinctactors$ID <- seq(1:1486)
 distinctactors$Actor2 <- distinctactors$Actor
+##setting colnames
 colnames(distinctactors) <- c("Actor1", "ID", "Actor2")
 #View(distinctactors)
+#merging and deleting unneeded cols
 merged1 <- merge(distinctactors, actorswide, by="Actor1")
 mergedint <-merged1[,-3]
 colnames(mergedint) <- c("Actor1", "ID", "Actor2")
 mergedint2 <- merge(distinctactors, mergedint, by="Actor2")
-
+##formating link dataframe
 finalmerged <- select(mergedint2, -c(1,2,4))
 colnames(finalmerged) <- c("Source", "Target")
 #View(finalmerged)
@@ -237,7 +240,7 @@ hugenodes <- select(distinctactors, c(1,2))
 colnames(hugenodes) <- c("Actor", "ID")
 
 
-
+##assigning nodes and links
 huge_links <- finalmerged
 huge_nodes <- hugenodes
 
@@ -248,7 +251,7 @@ huge_network <- graph_from_data_frame(huge_links,
                                     directed = F)
 
 
-
+#### Creating nodes and assigining lables and titles for future use 
 huge_nodes <- huge_nodes %>%
   mutate(label = Actor) %>% 
   mutate(title = Actor) %>% 
@@ -260,17 +263,17 @@ huge_links <- huge_links %>%
   mutate(value= betweenness)
 
 
-
+##creating edges from the source to target actor 
 edges <- data.frame(from = huge_links$Source, to=huge_links$Target)
-
+##removing a coloumn
 finalnodes<- as.data.frame(huge_nodes[,-1])
 colnames(finalnodes) <- (c("id", "lable", "title", "degree", "value"))
 #View(finalnodes)
-
+##removing unnecceary columns and setting coloumn names 
 huge_nodes <- as.data.frame(huge_nodes[,-1])
 colnames(huge_nodes) <- (c("id", "label", "title", "degree", "value"))
 
-
+##plotting interactive network
 visNetwork(nodes=huge_nodes, edges, main = "Large Network Diagram") %>% 
   visIgraphLayout(layout = "layout_nicely") %>% 
   visOptions(highlightNearest = T, nodesIdSelection = T)
@@ -309,7 +312,7 @@ Actors_small<- distinct(Actors_small)
 #Output: list of actors and who they are related to 
 actorNetwork_small <- graph_from_data_frame(d=actorswide2, vertices=Actors_small, directed=FALSE)
 
-#Producing graph with only actors who have more then one connection
+#Producing static graph with only actors who have more then one connection
 ggraph(actorNetwork_small)+
   geom_edge_link(alpha = 0.5) +     
   geom_node_point(size = 0.5, shape = 21, stroke = 1,
@@ -329,12 +332,13 @@ ll <- layout.auto(actorNetwork_small)
 #Adding IDs to actorswide
 Actors_small$ID <- seq(1:700)
 #ID1
+##setiing col names and merging when needed 
 colnames(actorswide2) <- c("Actor", "Actor2")
 merged1_small <- merge(Actors_small, actorswide2, by="Actor")
 #ID2
 colnames(merged1_small) <- c("Actor1", "ID1", "Actor")
 merged2_small <- merge(Actors_small, merged1_small, by="Actor")
-
+##selecting needed columns
 finalmerged_small <- select(merged2_small, c(2,4))
 colnames(finalmerged_small) <- c("Source", "Target")
 
@@ -348,7 +352,7 @@ nodes_small <- select(Actors_small, c(1,2))
 small_links <- finalmerged_small
 small_nodes <- nodes_small
 #View(small_nodes)
-
+##reproducing the same graph as large network for network of actors with only more than one connection see above comments for needed clarification
 
 ##creating network
 small_network <- graph_from_data_frame(small_links,
@@ -386,17 +390,19 @@ visNetwork(nodes=small_nodes, edges, main = "Actors With More Than One Connectio
 ```
 
 ```{r include=FALSE, message=FALSE, warning=FALSE}
+##cacluation bacon score for harry potter dataset, number of connections away for Harry Potter
 baconhp <- as.data.frame(distances(hp_network, v=V(hp_network)["Harry Potter"], to=V(hp_network), weights=NA))
-
+##taking the transpose as making it a dataframe
 baconhp <- as.data.frame(t(baconhp))
 baconhp <- tibble::rownames_to_column(baconhp, "Name")
 colnames(baconhp) <- c("Name", "Score")
 
 #View(baconhp)
-
+##calculating bacon score for network with more than one connection, had to begin with the ID because of how data was formatted but, this is steps away from Tom Hanks
 baconsmallnet <- as.data.frame(distances(small_network, v=V(small_network)["70"], to=V(small_network), weights=NA))
 
 names(baconsmallnet)<- NULL
+##adding in IDS
 baconsmallnet[nrow(baconsmallnet) + 1,] = seq(1:700)
 
 
@@ -408,7 +414,7 @@ baconsmallnet <- t(baconsmallnet)
 #View(baconsmallnet)
 colnames(baconsmallnet) <- c("Score", "ID")
 
-
+##merging bacon score to correct actor
 mergedbacon <- merge(Actors_small, baconsmallnet, by="ID")
 mergedbacon <- mergedbacon[,-1]
 #View(mergedbacon)
@@ -427,7 +433,7 @@ mergedbacon<- mergedbacon[,-1]
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-
+## formating interactive tables as a way to view bacon scores 
 library(reactable)
 
 library(reactable)
@@ -443,7 +449,7 @@ reactable(baconhp, filterable = TRUE, minRows = 1)
 ##For a specific genre
 
 
-
+##filtering down to only acotrs in drama movies
 drama <- top  %>%
   select(Title, Actor1:Actor2, Genre1) %>%
   filter(Genre1 == "Drama")
@@ -459,7 +465,7 @@ dramaActors <- distinct(dramaActors, Actor)
 
 
 
-
+##assigns IDS and repeating steps taken above
 dramaActors$ID <- seq(1:510)
 dramaActors$Actor2 <- dramaActors$Actor
 colnames(dramaActors) <- c("Actor1", "ID", "Actor2")
@@ -492,29 +498,29 @@ huge_networkdrama <- graph_from_data_frame(huge_linksdrama,
                                     directed = F)
 
 
-
+##creating nodes
 huge_nodesdrama <- huge_nodesdrama %>%
   mutate(label = Actor) %>% 
   mutate(title = Actor) %>% 
   mutate(degree= degree(huge_networkdrama)) %>% 
   mutate(value = degree)
-
+##creating links
 huge_linksdrama <- huge_linksdrama %>% 
   mutate(betweenness= edge_betweenness(huge_networkdrama)) %>% 
   mutate(value= betweenness)
 
 
-
+##creating edges
 edges <- data.frame(from = huge_linksdrama$Source, to=huge_linksdrama$Target)
 
 finalnodesdrama<- as.data.frame(huge_nodesdrama[,-1])
 colnames(finalnodesdrama) <- (c("id", "lable", "title", "degree", "value"))
 #View(finalnodes)
-
+##nodes 
 huge_nodesdrama <- as.data.frame(huge_nodesdrama[,-1])
 colnames(huge_nodesdrama) <- (c("id", "label", "title", "degree", "value"))
 
-
+##interactive network
 visNetwork(nodes=huge_nodesdrama, edges, main = "Drama Network Diagram") %>% 
   visIgraphLayout(layout = "layout_nicely") %>% 
   visOptions(highlightNearest = T, nodesIdSelection = T)
